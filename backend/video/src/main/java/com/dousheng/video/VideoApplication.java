@@ -1,13 +1,13 @@
-package com.dousheng.publish;
+package com.dousheng.video;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class PublishApplication {
+public class VideoApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(PublishApplication.class, args);
+        SpringApplication.run(VideoApplication.class, args);
     }
 
 }

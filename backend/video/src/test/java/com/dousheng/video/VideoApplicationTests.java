@@ -1,10 +1,10 @@
-package com.dousheng.publish;
+package com.dousheng.video;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class PublishApplicationTests {
+class VideoApplicationTests {
 
     @Test
     void contextLoads() {

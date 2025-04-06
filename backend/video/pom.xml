@@ -8,7 +8,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>publish</artifactId>
+    <artifactId>video</artifactId>
 
     <dependencies>
         <dependency>

@@ -10,7 +10,7 @@
         <module>gateway</module>
         <module>auth</module>
         <module>user</module>
-        <module>publish</module>
+        <module>video</module>
         <module>feed</module>
         <module>relation</module>
         <module>favorite</module>
