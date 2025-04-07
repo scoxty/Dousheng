@@ -1,0 +1,16 @@
+server:
+  port: 3002
+
+spring:
+  application:
+    name: user
+
+dubbo:
+  application:
+    name: user
+    qos-port: 22224
+  protocol:
+    name: dubbo
+    port: 20882
+  registry:
+    address: nacos://127.0.0.1:8848

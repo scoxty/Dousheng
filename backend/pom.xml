@@ -16,6 +16,7 @@
         <module>favorite</module>
         <module>comment</module>
         <module>message</module>
+        <module>rpc</module>
     </modules>
     <packaging>pom</packaging>
 
