@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 
-import static com.dousheng.api.common.constant.Lua.TOKEN_BUKEY_LUA_SCRIPT_PATH;
+import static com.dousheng.api.common.constant.Lua.TOKEN_BUCKEY_LUA_SCRIPT_PATH;
 import static com.dousheng.api.common.constant.RedisKeyConstant.RATE_LIMIT_BY_IP_KEY;
 
 /**
@@ -34,7 +34,7 @@ public class RateLimiterByIP {
         String key = String.format(RATE_LIMIT_BY_IP_KEY, ip);
 
         DefaultRedisScript<Long> script = new DefaultRedisScript<>();
-        script.setScriptSource(new ResourceScriptSource(new ClassPathResource(TOKEN_BUKEY_LUA_SCRIPT_PATH)));
+        script.setScriptSource(new ResourceScriptSource(new ClassPathResource(TOKEN_BUCKEY_LUA_SCRIPT_PATH)));
         script.setResultType(Long.class);
 
         ArrayList<String> keys = new ArrayList<>();

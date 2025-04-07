@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 
-import static com.dousheng.api.common.constant.Lua.TOKEN_BUKEY_LUA_SCRIPT_PATH;
+import static com.dousheng.api.common.constant.Lua.TOKEN_BUCKEY_LUA_SCRIPT_PATH;
 import static com.dousheng.api.common.constant.RedisKeyConstant.RATE_LIMIT_KEY;
 
 /**
@@ -28,7 +28,7 @@ public class GlobalLimiter {
 
     public boolean isAllowed() {
         DefaultRedisScript<Long> script = new DefaultRedisScript<>();
-        script.setScriptSource(new ResourceScriptSource(new ClassPathResource(TOKEN_BUKEY_LUA_SCRIPT_PATH)));
+        script.setScriptSource(new ResourceScriptSource(new ClassPathResource(TOKEN_BUCKEY_LUA_SCRIPT_PATH)));
         script.setResultType(Long.class);
 
         ArrayList<String> keys = new ArrayList<>();
