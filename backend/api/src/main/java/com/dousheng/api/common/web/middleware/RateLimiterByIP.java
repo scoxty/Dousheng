@@ -2,15 +2,16 @@ package com.dousheng.api.common.web.middleware;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 
-import static com.dousheng.api.common.constant.Lua.LUA_TOKEN_BUKET;
+import static com.dousheng.api.common.constant.Lua.TOKEN_BUKEY_LUA_SCRIPT_PATH;
 import static com.dousheng.api.common.constant.RedisKeyConstant.RATE_LIMIT_BY_IP_KEY;
-import static com.dousheng.api.common.constant.RedisKeyConstant.RATE_LIMIT_KEY;
 
 /**
  * 基于IP的令牌桶限流
@@ -33,7 +34,7 @@ public class RateLimiterByIP {
         String key = String.format(RATE_LIMIT_BY_IP_KEY, ip);
 
         DefaultRedisScript<Long> script = new DefaultRedisScript<>();
-        script.setScriptText(LUA_TOKEN_BUKET);
+        script.setScriptSource(new ResourceScriptSource(new ClassPathResource(TOKEN_BUKEY_LUA_SCRIPT_PATH)));
         script.setResultType(Long.class);
 
         ArrayList<String> keys = new ArrayList<>();
