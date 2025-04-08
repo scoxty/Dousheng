@@ -1,5 +1,6 @@
 package com.dousheng.api.common.web.middleware;
 
+import com.dousheng.api.toolkit.IPUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
@@ -29,8 +30,7 @@ public class RateLimiterByIP {
     private static final Long INIT_TOKEN = 50L; // 初始桶内得令牌数
 
     public boolean isAllowed(HttpServletRequest request) {
-        String addr = request.getRemoteAddr();
-        String ip = addr.split(":")[0];
+        String ip = IPUtil.getRequestIp(request);
         String key = String.format(RATE_LIMIT_BY_IP_KEY, ip);
 
         DefaultRedisScript<Long> script = new DefaultRedisScript<>();

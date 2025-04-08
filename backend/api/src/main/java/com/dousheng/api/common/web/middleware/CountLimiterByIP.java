@@ -1,5 +1,6 @@
 package com.dousheng.api.common.web.middleware;
 
+import com.dousheng.api.toolkit.IPUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,8 +24,7 @@ public class CountLimiterByIP {
     private static final int MAX_COUNT = 1;
 
     public boolean isAllowed(HttpServletRequest request) {
-        String addr = request.getRemoteAddr();
-        String ip = addr.split(":")[0];
+        String ip = IPUtil.getRequestIp(request);
         String key = String.format(AUTH_COUNT_LIMIT_BY_IP_KEY, ip);
         redisTemplate.opsForValue().setIfAbsent(key, 0, LIMITER_TIME, TimeUnit.MILLISECONDS);
         Integer cnt = (Integer) redisTemplate.opsForValue().get(key);
