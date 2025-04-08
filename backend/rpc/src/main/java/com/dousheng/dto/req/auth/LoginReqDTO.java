@@ -1,11 +1,15 @@
 package com.dousheng.dto.req.auth;
 
-import lombok.Data;
+import lombok.*;
 
 import java.io.Serializable;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class LoginReqDTO implements Serializable {
-    private String mobile;
-    private String smsCode;
+    private String username;
+    private String password;
 }

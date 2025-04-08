@@ -1,5 +1,7 @@
-package com.dousheng.api.config;
+package com.dousheng.auth.config;
 
+import org.redisson.Redisson;
+import org.redisson.config.Config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -9,7 +11,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @SuppressWarnings("all")
 @Configuration
-public class RedisConfig {
+public class RedisSerializeConfig {
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();

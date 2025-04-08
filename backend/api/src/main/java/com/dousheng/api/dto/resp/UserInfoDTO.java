@@ -12,22 +12,22 @@ import java.util.Date;
 @NoArgsConstructor
 @ToString
 public class UserInfoDTO {
-    private String id;
-    private String mobile;
-    private String nickname;
-    private String douShengNum;
-    private String face;
+    private Long id;
+    private String name;
+    private String password;
+    private String doushengNum;
     private Integer sex;
     private Date birthday;
     private String country;
     private String province;
     private String city;
     private String district;
-    private String description;
-    private String bgImg;
-    private Integer canImoocNumBeUpdated;
-    private Date createdTime;
-    private Date updatedTime;
+    private String signature;
+    private String avatar;
+    private String backgroundImage;
+    private Integer canDoushengNumBeUpdated;
+    private Date createTime;
+    private Date updateTime;
 
     private String userToken;
 

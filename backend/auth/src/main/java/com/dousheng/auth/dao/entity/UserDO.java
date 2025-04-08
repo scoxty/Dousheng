@@ -1,16 +1,20 @@
-package com.dousheng.dto.common;
+package com.dousheng.auth.dao.entity;
 
-import lombok.*;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.dousheng.auth.common.database.BaseDO;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.util.Date;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-public class UserInfoDTO implements Serializable {
+@TableName(value = "user")
+public class UserDO extends BaseDO {
     private Long id;
     private String name;
     private String password;
@@ -25,14 +29,4 @@ public class UserInfoDTO implements Serializable {
     private String avatar;
     private String backgroundImage;
     private Integer canDoushengNumBeUpdated;
-    private Date createTime;
-    private Date updateTime;
-
-    private String userToken;
-
-    private Integer myFollowsCounts;
-    private Integer myFansCounts;
-    //    private Integer myLikedVlogCounts;
-    private Integer totalLikeMeCounts;
 }
-

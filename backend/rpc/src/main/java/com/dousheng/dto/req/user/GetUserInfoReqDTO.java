@@ -1,10 +1,14 @@
 package com.dousheng.dto.req.user;
 
-import lombok.Data;
+import lombok.*;
 
 import java.io.Serializable;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class GetUserInfoReqDTO implements Serializable {
-    private String userId;
+    private Long userId;
 }

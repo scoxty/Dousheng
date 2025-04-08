@@ -24,7 +24,7 @@ public class IntercepetorConfig implements WebMvcConfigurer {
         registry.addInterceptor(globalLimiterInterceptor).addPathPatterns("/**");
 
         // 限制单个IP的访问次数
-        registry.addInterceptor(countLimiterInterceptor).addPathPatterns("/passport/getSMSCode");
+        registry.addInterceptor(countLimiterInterceptor).addPathPatterns("/passport/register");
         registry.addInterceptor(countLimiterInterceptor).addPathPatterns("/passport/login");
         registry.addInterceptor(rateLimiterInterceptor).addPathPatterns("/passport/logout");
 
