@@ -35,7 +35,7 @@ public class AuthServiceHandler implements AuthRpcService {
         } catch (AbstractException e) {
             // 已知业务异常处理
             respDTO.setCode(e.getErrorCode());
-            respDTO.setMessage(e.getMessage());
+            respDTO.setMessage(e.getErrorMessage());
             log.error("[authenticate] error: req={}, resp={}, err={}", requestParam, respDTO, e);
         } catch (Throwable e) {
             // 未知系统异常处理
@@ -55,7 +55,7 @@ public class AuthServiceHandler implements AuthRpcService {
         } catch (AbstractException e) {
             // 已知业务异常处理
             respDTO.setCode(e.getErrorCode());
-            respDTO.setMessage(e.getMessage());
+            respDTO.setMessage(e.getErrorMessage());
             log.error("[register] error: req={}, resp={}, err={}", requestParam, respDTO, e);
         } catch (Throwable e) {
             // 未知系统异常处理
@@ -74,7 +74,7 @@ public class AuthServiceHandler implements AuthRpcService {
             log.info("[login] success: req={}, resp={}", requestParam, respDTO);
         } catch (AbstractException e) {
             respDTO.setCode(e.getErrorCode());
-            respDTO.setMessage(e.getMessage());
+            respDTO.setMessage(e.getErrorMessage());
             log.error("[login] error: req={}, resp={}, err={}", requestParam, respDTO, e);
         } catch (Throwable e) {
             respDTO.setCode(BaseErrorCode.SERVICE_ERROR.code());
@@ -92,7 +92,7 @@ public class AuthServiceHandler implements AuthRpcService {
             log.info("[logout] success: req={}, resp={}", requestParam, respDTO);
         } catch (AbstractException e) {
             respDTO.setCode(e.getErrorCode());
-            respDTO.setMessage(e.getMessage());
+            respDTO.setMessage(e.getErrorMessage());
             log.error("[logout] error: req={}, resp={}, err={}", requestParam, respDTO, e);
         } catch (Throwable e) {
             respDTO.setCode(BaseErrorCode.SERVICE_ERROR.code());
