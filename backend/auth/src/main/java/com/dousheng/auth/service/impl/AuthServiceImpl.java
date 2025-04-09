@@ -85,6 +85,7 @@ public class AuthServiceImpl implements AuthService {
             if (!addUserRespDTO.getCode().equals(SUCCESS_CODE)) {
                 throw new ServiceException(addUserRespDTO.getMessage(), REGISTER_SAVE_USER_ERROR);
             }
+            usernameCachePenetrationBloomFilter.add(requestParam.getUsername());
         } finally {
             lock.unlock();
         }
