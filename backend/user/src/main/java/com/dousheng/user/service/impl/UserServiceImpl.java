@@ -38,6 +38,7 @@ import com.google.common.cache.Cache;
 import io.netty.util.internal.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.dao.DuplicateKeyException;
@@ -67,6 +68,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     private final RedisTemplate redisTemplate;
     private final Cache<Long, UserDO> userInfoLocalCache;
     private final Cache<String, Long> userIdLocalCache;
+    private final RBloomFilter<String> usernameCachePenetrationBloomFilter;
+    private final RBloomFilter<Long> userIdCachePenetrationBloomFilter;
 
     private final ExecutorService executorService = new ThreadPoolExecutor(
             Runtime.getRuntime().availableProcessors() << 1,
@@ -79,6 +82,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     @Override
     public GetUserInfoRespDTO getUserInfo(GetUserInfoReqDTO requestParam) {
         this.checkParam(requestParam);
+
+        if (requestParam.getUserId() != null && !userIdCachePenetrationBloomFilter.contains(requestParam.getUserId())) {
+            throw new ClientException(USER_NOT_EXISTS);
+        }
+        if (StrUtil.isNotBlank(requestParam.getUsername()) && !usernameCachePenetrationBloomFilter.contains(requestParam.getUsername())) {
+            throw new ClientException(USER_NOT_EXISTS);
+        }
 
         Long userId = requestParam.getUserId();
         if (userId == null) {
@@ -144,6 +154,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         redisTemplate.opsForValue().set(String.format(USER_INFO_KEY, userDO.getId()), JSON.toJSONString(userDO),
                 USER_INFO_BASE_TTL + ThreadLocalRandom.current().nextInt(31), TimeUnit.SECONDS);
         userInfoLocalCache.put(userDO.getId(), userDO);
+        userIdCachePenetrationBloomFilter.add(userDO.getId());
+        usernameCachePenetrationBloomFilter.add(userDO.getName());
 
         AddUserRespDTO addUserRespDTO = AddUserRespDTO.builder().code(SUCCESS_CODE).message(SUCCESS_MESSAGE).build();
 
