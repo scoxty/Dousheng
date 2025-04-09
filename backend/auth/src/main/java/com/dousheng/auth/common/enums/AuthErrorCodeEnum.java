@@ -17,7 +17,11 @@ public enum AuthErrorCodeEnum implements IErrorCode {
     USER_REPEATED_LOGIN("A000400", "重复登录"),
     USER_NOT_LOGIN("A000401", "未登录"),
 
-    AUTH_ERROR("A000500", "认证失败"),
+    LOGIN_ERROR("A000500", "登录失败"),
+    PASSWORD_ERROR("A000501", "密码错误"),
+
+
+    AUTH_ERROR("A000600", "认证失败"),
 
     REGISTER_SERVER_ERROR("B000300", "用户注册失败"),
     REGISTER_SAVE_USER_ERROR("B000301", "新增用户失败");

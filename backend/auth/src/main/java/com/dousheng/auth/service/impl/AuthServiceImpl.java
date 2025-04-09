@@ -5,6 +5,7 @@ import com.dousheng.auth.common.convention.exception.ClientException;
 import com.dousheng.auth.common.convention.exception.ServiceException;
 import com.dousheng.auth.common.enums.AuthErrorCodeEnum;
 import com.dousheng.auth.service.AuthService;
+import com.dousheng.auth.toolkit.EncryptionUtil;
 import com.dousheng.dto.common.UserInfoDTO;
 import com.dousheng.dto.req.auth.AuthenticateReqDTO;
 import com.dousheng.dto.req.auth.RegisterReqDTO;
@@ -29,9 +30,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
-import static com.dousheng.auth.common.constant.RedisCacheConstant.LOCK_USER_REGISTER_KEY;
-import static com.dousheng.auth.common.constant.RedisCacheConstant.USER_LOGIN_KEY;
+import static com.dousheng.auth.common.constant.RedisCacheConstant.*;
 import static com.dousheng.auth.common.constant.SuccessBaseRespConstant.SUCCESS_CODE;
 import static com.dousheng.auth.common.constant.SuccessBaseRespConstant.SUCCESS_MESSAGE;
 import static com.dousheng.auth.common.enums.AuthErrorCodeEnum.*;
@@ -116,8 +117,12 @@ public class AuthServiceImpl implements AuthService {
             throw new ClientException(USER_REPEATED_LOGIN);
         }
 
+        if (!EncryptionUtil.matchPassword(requestParam.getPassword(), userInfo.getPassword())) {
+            throw new ClientException(PASSWORD_ERROR);
+        }
+
         String uuid = UUID.randomUUID().toString();
-        redisTemplate.opsForValue().set(USER_LOGIN_KEY + userInfo.getId(), uuid);
+        redisTemplate.opsForValue().set(USER_LOGIN_KEY + userInfo.getId(), uuid, TOKEN_TTL, TimeUnit.SECONDS);
 
         userInfo.setUserToken(uuid);
         LoginRespDTO respDTO = LoginRespDTO.builder().
@@ -228,7 +233,7 @@ public class AuthServiceImpl implements AuthService {
         Date now = new Date();
         UserInfoDTO userInfoDTO = UserInfoDTO.builder().
                 name(requestParam.getUsername()).
-                password(requestParam.getPassword()).
+                password(EncryptionUtil.encryptPassword(requestParam.getPassword())).
                 sex(SECRET.type).
                 doushengNum(doushengNum).
                 birthday(now).
