@@ -13,6 +13,6 @@ import java.io.Serializable;
 public class ModifyImageReqDTO implements Serializable {
     private Long fromUserId;
     private Long toUserId;
-    private String type;
-    private String image;
+    private Integer type;
+    private String image; // base64编码的图片
 }

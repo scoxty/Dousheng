@@ -40,6 +40,7 @@
         <guava.version>30.0-jre</guava.version>
         <dubbo.version>3.2.0</dubbo.version>
         <oss.version>3.15.1</oss.version>
+        <transmittable-thread-local.version>2.14.4</transmittable-thread-local.version>
     </properties>
 
     <dependencies>
@@ -177,6 +178,12 @@
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-runtime</artifactId>
                 <version>2.3.3</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>transmittable-thread-local</artifactId>
+                <version>${transmittable-thread-local.version}</version>
             </dependency>
 
         </dependencies>

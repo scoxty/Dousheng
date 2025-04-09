@@ -12,6 +12,6 @@ import java.io.Serializable;
 @ToString
 public class ModifyUserInfoReqDTO implements Serializable {
     private Long fromUserId;
-    private String type;
+    private Integer type;
     private UserInfoDTO userInfo;
 }

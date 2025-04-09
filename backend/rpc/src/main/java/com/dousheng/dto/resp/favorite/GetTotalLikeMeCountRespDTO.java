@@ -1,4 +1,4 @@
-package com.dousheng.dto.resp.user;
+package com.dousheng.dto.resp.favorite;
 
 import lombok.*;
 
@@ -9,7 +9,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class AddUserRespDTO implements Serializable {
+public class GetTotalLikeMeCountRespDTO implements Serializable {
     private String code;
     private String message;
+    private Integer totalLikeMeCount;
 }

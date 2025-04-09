@@ -1,9 +1,9 @@
 server:
-  port: 3002
+  port: 3004
 
 spring:
   application:
-    name: user
+    name: favorite
   data:
     redis:
       host: 127.0.0.1
@@ -17,10 +17,10 @@ spring:
 
 dubbo:
   application:
-    name: user
-    qos-port: 22224
+    name: favorite
+    qos-port: 22226
   protocol:
     name: dubbo
-    port: 20882
+    port: 20884
   registry:
     address: nacos://127.0.0.1:8848

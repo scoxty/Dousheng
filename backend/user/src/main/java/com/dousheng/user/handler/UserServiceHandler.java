@@ -2,13 +2,17 @@ package com.dousheng.user.handler;
 
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
+import com.dousheng.dto.req.user.AddUserReqDTO;
 import com.dousheng.dto.req.user.GetUserInfoReqDTO;
 import com.dousheng.dto.req.user.ModifyImageReqDTO;
 import com.dousheng.dto.req.user.ModifyUserInfoReqDTO;
+import com.dousheng.dto.resp.user.AddUserRespDTO;
 import com.dousheng.dto.resp.user.GetUserInfoRespDTO;
 import com.dousheng.dto.resp.user.ModifyImageRespDTO;
 import com.dousheng.dto.resp.user.ModifyUserInfoRespDTO;
 import com.dousheng.service.UserRpcService;
+import com.dousheng.user.common.convention.errorcode.BaseErrorCode;
+import com.dousheng.user.common.convention.exception.AbstractException;
 import com.dousheng.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -24,16 +28,81 @@ public class UserServiceHandler implements UserRpcService {
 
     @Override
     public GetUserInfoRespDTO getUserInfo(GetUserInfoReqDTO requestParam) {
-        return null;
+        GetUserInfoRespDTO respDTO = new GetUserInfoRespDTO();
+        try {
+            respDTO = userService.getUserInfo(requestParam);
+            log.info("[getUserInfo] success: req={}, resp={}", requestParam, respDTO);
+        } catch (AbstractException e) {
+            // 已知业务异常处理
+            respDTO.setCode(e.getErrorCode());
+            respDTO.setMessage(e.getErrorMessage());
+            log.error("[getUserInfo] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        } catch (Throwable e) {
+            // 未知系统异常处理
+            respDTO.setCode(BaseErrorCode.SERVICE_ERROR.code());
+            respDTO.setMessage(BaseErrorCode.SERVICE_ERROR.message());
+            log.error("[getUserInfo] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        }
+        return respDTO;
+    }
+
+    @Override
+    public AddUserRespDTO addUser(AddUserReqDTO requestParam) {
+        AddUserRespDTO respDTO = new AddUserRespDTO();
+        try {
+            respDTO = userService.addUser(requestParam);
+            log.info("[addUser] success: req={}, resp={}", requestParam, respDTO);
+        } catch (AbstractException e) {
+            // 已知业务异常处理
+            respDTO.setCode(e.getErrorCode());
+            respDTO.setMessage(e.getErrorMessage());
+            log.error("[addUser] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        } catch (Throwable e) {
+            // 未知系统异常处理
+            respDTO.setCode(BaseErrorCode.SERVICE_ERROR.code());
+            respDTO.setMessage(BaseErrorCode.SERVICE_ERROR.message());
+            log.error("[addUser] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        }
+        return respDTO;
     }
 
     @Override
     public ModifyUserInfoRespDTO modifyUserInfo(ModifyUserInfoReqDTO requestParam) {
-        return null;
+        ModifyUserInfoRespDTO respDTO = new ModifyUserInfoRespDTO();
+        try {
+            respDTO = userService.modifyUserInfo(requestParam);
+            log.info("[modifyUserInfo] success: req={}, resp={}", requestParam, respDTO);
+        } catch (AbstractException e) {
+            // 已知业务异常处理
+            respDTO.setCode(e.getErrorCode());
+            respDTO.setMessage(e.getErrorMessage());
+            log.error("[modifyUserInfo] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        } catch (Throwable e) {
+            // 未知系统异常处理
+            respDTO.setCode(BaseErrorCode.SERVICE_ERROR.code());
+            respDTO.setMessage(BaseErrorCode.SERVICE_ERROR.message());
+            log.error("[modifyUserInfo] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        }
+        return respDTO;
     }
 
     @Override
     public ModifyImageRespDTO modifyImage(ModifyImageReqDTO requestParam) {
-        return null;
+        ModifyImageRespDTO respDTO = new ModifyImageRespDTO();
+        try {
+            respDTO = userService.modifyImage(requestParam);
+            log.info("[modifyImage] success: req={}, resp={}", requestParam, respDTO);
+        } catch (AbstractException e) {
+            // 已知业务异常处理
+            respDTO.setCode(e.getErrorCode());
+            respDTO.setMessage(e.getErrorMessage());
+            log.error("[modifyImage] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        } catch (Throwable e) {
+            // 未知系统异常处理
+            respDTO.setCode(BaseErrorCode.SERVICE_ERROR.code());
+            respDTO.setMessage(BaseErrorCode.SERVICE_ERROR.message());
+            log.error("[modifyImage] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        }
+        return respDTO;
     }
 }

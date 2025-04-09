@@ -7,7 +7,7 @@ import java.util.Date;
 @Data
 public class ModifyUserInfoReqDTO {
     private String id;
-    private String username;
+    private String name;
     private String doushengNum;
     private Integer sex;
     private Date birthday;

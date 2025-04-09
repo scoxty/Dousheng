@@ -1,4 +1,4 @@
-package com.dousheng.dto.resp.user;
+package com.dousheng.dto.resp.relation;
 
 import lombok.*;
 
@@ -9,7 +9,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class AddUserRespDTO implements Serializable {
+public class GetFansCountRespDTO implements Serializable {
     private String code;
     private String message;
+    private Integer fansCount;
 }
