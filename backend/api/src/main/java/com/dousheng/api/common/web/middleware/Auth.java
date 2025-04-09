@@ -1,6 +1,8 @@
 package com.dousheng.api.common.web.middleware;
 
 import cn.hutool.core.util.NumberUtil;
+import com.dousheng.api.common.biz.user.UserContext;
+import com.dousheng.api.common.biz.user.UserInfoDTO;
 import com.dousheng.dto.req.auth.AuthenticateReqDTO;
 import com.dousheng.dto.resp.auth.AuthenticateRespDTO;
 import com.dousheng.service.AuthRpcService;
@@ -20,9 +22,15 @@ public class Auth {
     private AuthRpcService authRpcService;
 
     public boolean isAllowed(HttpServletRequest request) {
+        Long userId = NumberUtil.parseLong(request.getHeader("headerUserId"));
+        String token = request.getHeader("headerUserToken");
+
+        UserInfoDTO userInfoDTO = UserInfoDTO.builder().userId(userId).build();
+        UserContext.setUser(userInfoDTO);
+
         AuthenticateReqDTO reqDTO = AuthenticateReqDTO.builder().
-                userId(NumberUtil.parseLong(request.getHeader("headerUserId"))).
-                token(request.getHeader("headerUserToken")).build();
+                userId(userId).
+                token(token).build();
         AuthenticateRespDTO respDTO = authRpcService.authenticate(reqDTO);
         return respDTO.getCode().equals(SUCCESS_CODE);
     }
