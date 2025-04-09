@@ -47,7 +47,7 @@ public class AuthServiceImpl implements AuthService {
     private final RedissonClient redissonClient;
     private final RedisTemplate redisTemplate;
 
-    @DubboReference(timeout = 5000, retries = 3, loadbalance = "roundrobin")
+    @DubboReference(timeout = 4000, retries = 3, loadbalance = "roundrobin")
     private UserRpcService userRpcService;
 
     @Override
