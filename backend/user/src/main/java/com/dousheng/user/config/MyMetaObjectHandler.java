@@ -1,4 +1,4 @@
-package com.dousheng.auth.config;
+package com.dousheng.user.config;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import org.apache.ibatis.reflection.MetaObject;
@@ -11,7 +11,7 @@ import java.util.Date;
  * MyBatis-Plus 原数据自动填充类
  */
 @Primary
-@Component(value = "myMetaObjectHandlerByAuth")
+@Component(value = "myMetaObjectHandlerByUser")
 public class MyMetaObjectHandler implements MetaObjectHandler {
 
     @Override

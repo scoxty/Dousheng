@@ -11,4 +11,5 @@ import java.io.Serializable;
 @ToString
 public class GetUserInfoReqDTO implements Serializable {
     private Long userId;
+    private String username;
 }

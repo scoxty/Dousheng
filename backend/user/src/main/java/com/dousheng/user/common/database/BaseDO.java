@@ -1,4 +1,4 @@
-package com.dousheng.auth.common.database;
+package com.dousheng.user.common.database;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;

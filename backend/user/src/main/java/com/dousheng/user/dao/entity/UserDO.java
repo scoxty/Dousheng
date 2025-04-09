@@ -1,7 +1,7 @@
-package com.dousheng.auth.dao.entity;
+package com.dousheng.user.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.dousheng.auth.common.database.BaseDO;
+import com.dousheng.user.common.database.BaseDO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
