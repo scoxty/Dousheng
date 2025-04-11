@@ -1,0 +1,411 @@
+<template>
+	<view class="chat-page">
+		<!-- 顶部用户信息栏 -->
+		<view class="chat-header">
+			<image class="header-face" :src="friend.face" />
+			<text class="header-name">{{ friend.nickname }}</text>
+		</view>
+
+		<!-- 消息列表 -->
+		<scroll-view class="chat-body" scroll-y scroll-with-animation :scroll-top="scrollTop">
+			<view class="msg-wrapper" v-for="(msg, index) in list" :key="index"
+				:class="msg.senderId === loginUserId ? 'self' : 'friend'">
+				<image v-if="msg.senderId !== loginUserId" class="msg-face" :src="friend.face" />
+				<view class="msg-bubble">{{ msg.content }}</view>
+				<image v-if="msg.senderId === loginUserId" class="msg-face" :src="me.face" />
+			</view>
+			<view style="height: 20rpx;"></view>
+		</scroll-view>
+
+		<!-- 输入框 -->
+		<view class="chat-input">
+			<input v-model="content" class="input" placeholder="请输入消息…" />
+			<view class="send-btn" @click="sendMsg">发送</view>
+		</view>
+
+		<view id="last-msg-item" style="height: 1px;"></view>
+	</view>
+</template>
+
+
+
+<script>
+	var app = getApp();
+	export default {
+		data() {
+			return {
+				content: '',
+				list: [],
+				scrollTop: 0,
+				friend: {
+					nickname: '',
+					face: '',
+					userId: ''
+				},
+				me: {},
+				loginUserId: '',
+
+				// socket是否开启
+				socketOpen: false,
+				// 定时器
+				timer: null,
+
+				// 链接
+				surl: '', // WebSocket服务器URL
+
+				// 底部id用于定位到底部
+				scrollIntoView: "",
+
+				// 键盘高度
+				keyboardHeight: 0,
+
+				// 监听键盘高度的方法
+				listener: null,
+
+				flag: 0
+			};
+		},
+		onLoad(param) {
+			this.setUserInfo(param);
+			this.getMessageList();
+
+			// 开启键盘高度监听
+			this.listenerKeyboardHeight()
+
+			// socket初始化
+			this.init()
+
+			// 定时器，定时判断socket有没有掉线
+			this.timer = setInterval(() => {
+				this.isSocketConnct()
+			}, 2000)
+		},
+		beforeDestroy() {
+			// 关闭定时器
+			clearInterval(this.timer)
+
+			// 关闭键盘高度监听
+			uni.offKeyboardHeightChange(this.listener)
+
+			// 关闭Socket
+			this.closeSocket()
+		},
+		methods: {
+			setUserInfo(param) {
+				let friend = {};
+				if (param.friendInfo) {
+					try {
+						friend = JSON.parse(decodeURIComponent(param.friendInfo));
+					} catch (e) {
+						console.error("解析 friendInfo 失败：", e);
+					}
+				}
+				this.friend = friend;
+				var myUserInfo = getApp().getUserInfoSession();
+				if (myUserInfo == null) {
+					return;
+				}
+				this.me = myUserInfo;
+				this.loginUserId = myUserInfo.id;
+
+			},
+			getMessageList() {
+				// mock 数据
+				this.list = [{
+						content: '你好啊',
+						senderId: '123',
+						recevierId: "1909990512585195521"
+					},
+					{
+						content: '请问剪辑软件是什么',
+						senderId: '123',
+						recevierId: "1909990512585195521"
+					},
+					{
+						content: '我用的是剪映～',
+						senderId: '1909990512585195521',
+						recevierId: "1909990512585195521"
+					}
+				];
+				this.$nextTick(this.scrollToBottom);
+			},
+			sendMsg() {
+				if (!this.content) {
+					uni.showToast({
+						title: "发送的消息不能为空",
+						icon: "none"
+					});
+					return
+				}
+				this.list.push({
+					content: this.content,
+					senderId: this.loginUserId,
+					recevierId: this.friend.userId
+				});
+				this.content = '';
+				this.$nextTick(this.scrollToBottom);
+			},
+			// scrollToBottom() {
+			// 	this.scrollTop = 999999;
+			// },
+			// 发送消息
+			sendMsg() {
+				if (!this.content) {
+					uni.showToast({
+						title: "发送的消息不能为空",
+						icon: "none"
+					});
+					return
+				}
+
+				let data = {
+					senderId: this.loginUserId,
+					recevierId: this.friend.userId,
+					content: this.content
+				}
+				data = JSON.stringify(data);
+				
+				let that = this
+				if (this.socketOpen) {
+					uni.sendSocketMessage({
+						data,
+						success: (res) => {
+							this.content = "";
+							setTimeout(() => {
+								let param = JSON.parse(data)
+								that.sendMessageHandle(param)
+							}, 300)
+						},
+						fail(err) {
+							// 发送失败处理
+						}
+					});
+				} else {
+					// Socket没有开启，重新连接并重新发送消息
+					this.init()
+					setTimeout(() => {
+						this.sendMsg();
+					}, 300)
+				}
+			},
+
+			// 判断是否连接
+			isSocketConnct() {
+				if (!this.socketOpen) {
+					console.log("WebSocket 再次连接！");
+					this.init()
+				}
+			},
+
+			// 初始化
+			init() {
+				this.connect()
+				this.openSocket()
+				this.onclose()
+				this.onSocketMessage()
+			},
+
+			// 建立连接
+			connect() {
+				const url = app.globalData.wsServerUrl + "?userId=" + this.loginUserId + "?token=" + this.me.userToken;
+				console.log(url);
+				uni.connectSocket({
+					url: url,
+					method: 'GET'
+				});
+			},
+			// 打开Soceket
+			openSocket() {
+				let that = this
+				uni.onSocketOpen((res) => {
+					that.socketOpen = true
+					console.log('WebSocket连接已打开！');
+				});
+			},
+			// 监听关闭
+			onclose() {
+				let that = this
+				uni.onSocketClose((res) => {
+					that.socketOpen = false
+					console.log('WebSocket 已关闭！');
+				});
+			},
+
+			// 关闭
+			closeSocket() {
+				uni.closeSocket();
+			},
+
+
+			// 接收事件
+			onSocketMessage() {
+				let that = this
+				uni.onSocketMessage((res) => {
+					let obj = JSON.parse(res.data)
+					console.log("接收事件", obj);
+					this.onMessageHandle(obj)
+				});
+			},
+
+			// 接收---到事件后处理的方法
+			onMessageHandle(obj) {
+				this.list.push({
+					senderId: obj.senderId,
+					recevierId: obj.recevierId,
+					content: obj.content
+				})
+
+				// 滚动到底部
+				this.scrollToBottom()
+			},
+
+			// 发送---消息后处理的方法
+			sendMessageHandle(obj) {
+
+				this.list.push({
+					senderId: obj.senderId,
+					recevierId: obj.recevierId,
+					content: obj.content
+				});
+
+				// 滚动到底部
+				this.scrollToBottom()
+			},
+
+
+			// 定位到底部
+			scrollToBottom() {
+				this.$nextTick(() => {
+					this.scrollIntoView = "last-msg-item"
+					this.$nextTick(() => {
+						this.scrollIntoView = ""
+					})
+				})
+			},
+
+			// 开启键盘高度的监听
+			listenerKeyboardHeight() {
+				this.listener = (res) => {
+					console.log("键盘高度", res.height)
+					this.keyboardHeight = res.height
+					this.$nextTick(() => {
+						this.scrollToBottom()
+					})
+				}
+				uni.onKeyboardHeightChange(this.listener)
+			}
+		}
+	};
+</script>
+
+<style scoped>
+	.chat-page {
+		flex: 1;
+		flex-direction: column;
+		background-color: #f4f4f4;
+	}
+
+	/* 顶部信息栏 */
+	.chat-header {
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		padding: 20rpx 30rpx;
+		background-color: #dbe0f0;
+	}
+
+	.header-face {
+		width: 60rpx;
+		height: 60rpx;
+		border-radius: 50%;
+		margin-right: 20rpx;
+	}
+
+	.header-name {
+		font-size: 32rpx;
+		font-weight: bold;
+		color: #333;
+	}
+
+	/* 聊天消息列表 */
+	.chat-body {
+		flex: 1;
+		padding: 20rpx 24rpx;
+		background-color: #f9f9f9;
+	}
+
+	.msg-wrapper {
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+		/* fix 头像和气泡垂直错位问题 */
+		margin-bottom: 20rpx;
+	}
+
+	.msg-wrapper.friend {
+		justify-content: flex-start;
+	}
+
+	.msg-wrapper.self {
+		justify-content: flex-end;
+	}
+
+	.msg-face {
+		width: 60rpx;
+		height: 60rpx;
+		border-radius: 50%;
+		object-fit: cover;
+	}
+
+	.msg-bubble {
+		max-width: 200vw;
+		background-color: #fff;
+		font-size: 28rpx;
+		line-height: 44rpx;
+		padding: 20rpx 28rpx;
+		border-radius: 24rpx;
+		word-break: break-word;
+		white-space: normal;
+	}
+
+	.msg-wrapper.self .msg-bubble {
+		background-color: #e0f2ff;
+		align-items: flex-end;
+	}
+
+	/* 输入栏 */
+	.chat-input {
+		min-height: 120rpx;
+		background-color: #fff;
+		border-top: 1px solid #e5e5e5;
+		padding: 20rpx;
+		display: flex;
+		flex-direction: row;
+		align-items: flex-end;
+	}
+
+	.input {
+		flex: 1;
+		min-height: 80rpx;
+		background-color: #f0f0f0;
+		border-radius: 30rpx;
+		padding: 16rpx 24rpx;
+		font-size: 28rpx;
+		line-height: 40rpx;
+		margin-right: 20rpx;
+	}
+
+	/* 优化按钮居中 */
+	.send-btn {
+		width: 120rpx;
+		height: 78rpx;
+		background-color: #fa4b60;
+		color: #fff;
+		border-radius: 30rpx;
+		font-size: 30rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		text-align: center;
+	}
+</style>
