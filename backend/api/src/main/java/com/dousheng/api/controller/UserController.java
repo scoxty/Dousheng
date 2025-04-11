@@ -9,6 +9,7 @@ import com.dousheng.api.dto.resp.UserInfoDTO;
 import com.dousheng.api.common.convention.result.Result;
 import com.dousheng.api.common.convention.result.Results;
 import com.dousheng.api.dto.req.ModifyUserInfoReqDTO;
+import com.dousheng.api.toolkit.PackerUtil;
 import com.dousheng.dto.req.user.GetUserInfoReqDTO;
 import com.dousheng.dto.req.user.ModifyImageReqDTO;
 import com.dousheng.dto.resp.user.GetUserInfoRespDTO;
@@ -36,14 +37,14 @@ public class UserController {
         GetUserInfoReqDTO reqDTO = GetUserInfoReqDTO.builder().userId(userId).build();
         GetUserInfoRespDTO respDTO = userRpcService.getUserInfo(reqDTO);
         if (respDTO.getCode().equals(SUCCESS_CODE)) {
-            log.info("[getUserInfo] success: req={}, resp={}", userId, Results.success());
-            UserInfoDTO userInfoDTO = BeanUtil.copyProperties(respDTO.getUserInfo(), UserInfoDTO.class);
+            UserInfoDTO userInfoDTO = PackerUtil.packApiUserInfo(respDTO.getUserInfo());
+            log.info("[getUserInfo] success: req={}, resp={}", userId, Results.success(userInfoDTO));
             return Results.success(userInfoDTO);
         }
         Result<UserInfoDTO> result = new Result<>();
         result.setCode(respDTO.getCode());
         result.setMessage(respDTO.getMessage());
-        log.error("[getUserInfo] error: req={}, resp={}", userId, respDTO);
+        log.error("[getUserInfo] error: req={}, resp={}", userId, result);
         return result;
     }
 
@@ -52,17 +53,17 @@ public class UserController {
         com.dousheng.dto.req.user.ModifyUserInfoReqDTO reqDTO = new com.dousheng.dto.req.user.ModifyUserInfoReqDTO();
         reqDTO.setFromUserId(UserContext.getUserId());
         reqDTO.setType(type);
-        reqDTO.setUserInfo(BeanUtil.copyProperties(requestParam, com.dousheng.dto.common.UserInfoDTO.class));
+        reqDTO.setUserInfo(PackerUtil.packRpcUserInfo(requestParam));
         ModifyUserInfoRespDTO respDTO = userRpcService.modifyUserInfo(reqDTO);
         if (respDTO.getCode().equals(SUCCESS_CODE)) {
-            log.info("[modifyUserInfo] success: req={}, resp={}", reqDTO, respDTO);
-            UserInfoDTO userInfoDTO = BeanUtil.copyProperties(respDTO.getUserInfo(), UserInfoDTO.class);
+            UserInfoDTO userInfoDTO = PackerUtil.packApiUserInfo(respDTO.getUserInfo());
+            log.info("[modifyUserInfo] success: req={}, resp={}", reqDTO, Results.success(userInfoDTO));
             return Results.success(userInfoDTO);
         }
         Result<UserInfoDTO> result = new Result<>();
         result.setCode(respDTO.getCode());
         result.setMessage(respDTO.getMessage());
-        log.error("[modifyUserInfo] error: req={}, resp={}", reqDTO, respDTO);
+        log.error("[modifyUserInfo] error: req={}, resp={}", reqDTO, result);
         return result;
     }
 
@@ -83,14 +84,14 @@ public class UserController {
 
         ModifyImageRespDTO respDTO = userRpcService.modifyImage(reqDTO);
         if (respDTO.getCode().equals(SUCCESS_CODE)) {
-            log.info("[modifyImage] success: req={}, resp={}", reqDTO, respDTO);
-            UserInfoDTO userInfoDTO = BeanUtil.copyProperties(respDTO.getUserInfo(), UserInfoDTO.class);
+            UserInfoDTO userInfoDTO = PackerUtil.packApiUserInfo(respDTO.getUserInfo());
+            log.info("[modifyImage] success: req={}, resp={}", reqDTO, Results.success(userInfoDTO));
             return Results.success(userInfoDTO);
         }
         Result<UserInfoDTO> result = new Result<>();
         result.setCode(respDTO.getCode());
         result.setMessage(respDTO.getMessage());
-        log.error("[modifyImage] error: req={}, resp={}", reqDTO, respDTO);
+        log.error("[modifyImage] error: req={}, resp={}", reqDTO, result);
         return result;
     }
 

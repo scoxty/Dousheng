@@ -9,6 +9,7 @@ import com.dousheng.api.dto.resp.UserInfoDTO;
 import com.dousheng.api.common.convention.result.Result;
 import com.dousheng.api.common.convention.result.Results;
 import com.dousheng.api.dto.req.LoginReqDTO;
+import com.dousheng.api.toolkit.PackerUtil;
 import com.dousheng.dto.req.auth.LogoutReqDTO;
 import com.dousheng.dto.resp.auth.LoginRespDTO;
 import com.dousheng.dto.resp.auth.LogoutRespDTO;
@@ -46,7 +47,7 @@ public class AuthController {
         com.dousheng.dto.req.auth.LoginReqDTO reqDTO = BeanUtil.copyProperties(requestParam, com.dousheng.dto.req.auth.LoginReqDTO.class);
         LoginRespDTO respDTO = authRpcService.login(reqDTO);
         if (respDTO.getCode().equals(SUCCESS_CODE)) {
-            UserInfoDTO userInfoDTO = BeanUtil.copyProperties(respDTO.getUserInfo(), UserInfoDTO.class);
+            UserInfoDTO userInfoDTO = PackerUtil.packApiUserInfo(respDTO.getUserInfo());
             log.info("[login] success: req={}, resp={}", requestParam, Results.success(userInfoDTO));
             return Results.success(userInfoDTO);
         }

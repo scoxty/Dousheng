@@ -1,13 +1,18 @@
 package com.dousheng.api;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.NumberUtil;
+import com.dousheng.api.dto.req.ModifyUserInfoReqDTO;
+import com.dousheng.dto.common.UserInfoDTO;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
 class GatewayApplicationTests {
 
     @Test
-    void contextLoads() {
+    void testPacker() {
+        System.out.println(NumberUtil.parseLong(""));
+        System.out.println(NumberUtil.parseLong(" "));
+        System.out.println(NumberUtil.parseLong(null));
     }
 
 }

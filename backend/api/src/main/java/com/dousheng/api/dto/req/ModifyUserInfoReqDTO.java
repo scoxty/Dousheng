@@ -7,16 +7,16 @@ import java.util.Date;
 @Data
 public class ModifyUserInfoReqDTO {
     private String id;
-    private String name;
-    private String doushengNum;
+    private String nickname;
+    private String imoocNum;
+    private String face;
     private Integer sex;
     private Date birthday;
     private String country;
     private String province;
     private String city;
     private String district;
-    private String signature;
-    private String avatar;
-    private String backgroundImage;
-    private Integer canDoushengNumBeUpdated;
+    private String description;
+    private String bgImg;
+    private Integer canImoocNumBeUpdated;
 }
