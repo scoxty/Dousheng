@@ -41,6 +41,8 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.redisson.executor.ScheduledTasksService;
+import org.springframework.context.annotation.Bean;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -54,6 +56,7 @@ import static com.dousheng.user.common.convention.errorcode.BaseErrorCode.REMOTE
 import static com.dousheng.user.common.enums.UserErrorCodeEnum.*;
 import static com.dousheng.user.common.enums.UserInfoModifyImageTypeEnum.AVATAR;
 import static com.dousheng.user.common.enums.UserInfoModifyImageTypeEnum.BACKGROUD_IMAGE;
+import static com.dousheng.user.common.enums.UserInfoModifyTypeEnum.*;
 
 @Service
 @RequiredArgsConstructor
@@ -166,16 +169,39 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     public ModifyUserInfoRespDTO modifyUserInfo(ModifyUserInfoReqDTO requestParam) {
         this.checkParam(requestParam);
 
+        UserDO userDO = new UserDO();
+        Integer modifyType = requestParam.getType();
+        if (modifyType.equals(NAME.type)) {
+            userDO.setName(requestParam.getUserInfo().getName());
+        } else if (modifyType.equals(DOUSHENG_NUM.type)) {
+            userDO.setDoushengNum(requestParam.getUserInfo().getDoushengNum());
+        } else if (modifyType.equals(SEX.type)) {
+            userDO.setSex(requestParam.getUserInfo().getSex());
+        } else if (modifyType.equals(BIRTHDAY.type)) {
+            userDO.setBirthday(requestParam.getUserInfo().getBirthday());
+        } else if (modifyType.equals(LOCATION.type)) {
+            userDO.setCountry(requestParam.getUserInfo().getCountry());
+            userDO.setProvince(requestParam.getUserInfo().getProvince());
+            userDO.setCity(requestParam.getUserInfo().getCity());
+            userDO.setDistrict(requestParam.getUserInfo().getDistrict());
+        } else if (modifyType.equals(SIGNATURE.type)) {
+            userDO.setSignature(requestParam.getUserInfo().getSignature());
+        }
+
         LambdaUpdateWrapper<UserDO> updateWrapper = Wrappers.lambdaUpdate(UserDO.class)
                 .eq(UserDO::getId, requestParam.getFromUserId());
-        baseMapper.update(BeanUtil.toBean(requestParam, UserDO.class), updateWrapper);
+        baseMapper.update(userDO, updateWrapper);
         
         userInfoLocalCache.invalidate(requestParam.getFromUserId());
         redisTemplate.delete(String.format(USER_INFO_KEY, requestParam.getFromUserId()));
 
+        LambdaQueryWrapper<UserDO> queryWrapper = Wrappers.lambdaQuery(UserDO.class)
+                .eq(UserDO::getId, requestParam.getFromUserId());
+        UserDO newUserDO = baseMapper.selectOne(queryWrapper);
         ModifyUserInfoRespDTO respDTO = ModifyUserInfoRespDTO.builder().
                 code(SUCCESS_CODE).
                 message(SUCCESS_MESSAGE).
+                userInfo(BeanUtil.copyProperties(newUserDO, UserInfoDTO.class)).
                 build();
 
         return respDTO;
@@ -201,14 +227,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         LambdaUpdateWrapper<UserDO> updateWrapper = Wrappers.lambdaUpdate(UserDO.class)
                 .eq(UserDO::getId, requestParam.getToUserId());
         baseMapper.update(userDO, updateWrapper);
+
         userInfoLocalCache.invalidate(requestParam.getToUserId());
         redisTemplate.delete(String.format(USER_INFO_KEY, requestParam.getToUserId()));
 
-        GetUserInfoRespDTO getUserInfoRespDTO = this.getUserInfo(GetUserInfoReqDTO.builder().userId(requestParam.getToUserId()).build());
+        LambdaQueryWrapper<UserDO> queryWrapper = Wrappers.lambdaQuery(UserDO.class)
+                .eq(UserDO::getId, requestParam.getFromUserId());
+        UserDO newUserDO = baseMapper.selectOne(queryWrapper);
         ModifyImageRespDTO respDTO = ModifyImageRespDTO.builder().
                 code(SUCCESS_CODE).
                 message(SUCCESS_MESSAGE).
-                userInfo(getUserInfoRespDTO.getUserInfo()).build();
+                userInfo(BeanUtil.copyProperties(newUserDO, UserInfoDTO.class)).
+                build();
 
         return respDTO;
     }
@@ -265,6 +295,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         }
 
         UserInfoDTO userInfo = requestParam.getUserInfo();
+
         if (requestParam.getFromUserId() == null || requestParam.getFromUserId() == 0L) {
             throw new ClientException(USERID_NULL);
         }
@@ -274,36 +305,66 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         if (!requestParam.getFromUserId().equals(userInfo.getId())) {
             throw new ClientException(NO_PERMISSION_TO_MODIFY);
         }
+
         if (requestParam.getType() == null) {
             throw new ClientException(MODIFY_TYPE_NULL);
         }
         if (!UserInfoModifyTypeEnum.isValid(requestParam.getType())) {
             throw new ClientException(MODIFY_TYPE_INVALID);
         }
-        if (StrUtil.isBlank(userInfo.getName())) {
+
+        if (StrUtil.isBlank(userInfo.getName()) &&
+                requestParam.getType().equals(UserInfoModifyTypeEnum.NAME.type)) {
             throw new ClientException(USERNAME_NULL);
         }
-        if (StrUtil.isNotBlank(userInfo.getPassword())) {
-            throw new ClientException(PASSWORD_NOT_SUPPORT_UPDATE);
+        if (requestParam.getType().equals(UserInfoModifyTypeEnum.NAME.type) &&
+                !userIdCachePenetrationBloomFilter.contains(userInfo.getId())) {
+            throw new ClientException(USER_NOT_EXISTS);
         }
-        if (StrUtil.isBlank(userInfo.getDoushengNum())) {
+
+        if (StrUtil.isBlank(userInfo.getDoushengNum()) &&
+                requestParam.getType().equals(DOUSHENG_NUM.type)) {
             throw new ClientException(DOUSHENG_NUM_NULL);
         }
-        if (!SexEnum.isValid(userInfo.getSex())) {
+        if (requestParam.getType().equals(DOUSHENG_NUM.type) &&
+                !this.canUpdateDoushengNum(userInfo.getId())) {
+            throw new ClientException(NO_PERMISSION_TO_MODIFY);
+        }
+
+        if (userInfo.getSex() == null &&
+                requestParam.getType().equals(SEX.type)) {
+            throw new ClientException(SEX_NULL);
+        }
+        if (userInfo.getSex() != null && !SexEnum.isValid(userInfo.getSex())) {
             throw new ClientException(INVALID_SEX);
         }
-        if (userInfo.getBirthday() == null) {
+
+        if (userInfo.getBirthday() == null &&
+                requestParam.getType().equals(UserInfoModifyTypeEnum.BIRTHDAY.type)) {
             throw new ClientException(BIRTHDAY_NULL);
         }
-        if (StrUtil.isBlank(userInfo.getSignature())) {
+
+        if ((StrUtil.isBlank(userInfo.getCountry()) ||
+                StrUtil.isBlank(userInfo.getProvince()) ||
+                StrUtil.isBlank(userInfo.getCity())) &&
+                requestParam.getType().equals(UserInfoModifyTypeEnum.LOCATION.type)) {
+            throw new ClientException(LOCATION_NULL);
+        }
+
+        if (StrUtil.isBlank(userInfo.getSignature()) &&
+                requestParam.getType().equals(UserInfoModifyTypeEnum.SIGNATURE.type)) {
             throw new ClientException(SIGNATURE_NULL);
         }
-        if (StrUtil.isBlank(userInfo.getAvatar())) {
-            throw new ClientException(AVATAR_NULL);
+    }
+
+    private boolean canUpdateDoushengNum(Long userId) {
+        LambdaQueryWrapper<UserDO> queryWrapper = Wrappers.lambdaQuery(UserDO.class)
+                .eq(UserDO::getId, userId);
+        UserDO userDO = baseMapper.selectOne(queryWrapper);
+        if (userDO == null) {
+            throw new ClientException(USER_NOT_EXISTS);
         }
-        if (userInfo.getCanDoushengNumBeUpdated() == null) {
-            throw new ClientException(CAN_UPDATE_DOUSHENG_NUM_NULL);
-        }
+        return userDO.getCanDoushengNumBeUpdated() == 1;
     }
 
     public void checkParam(ModifyImageReqDTO requestParam) {

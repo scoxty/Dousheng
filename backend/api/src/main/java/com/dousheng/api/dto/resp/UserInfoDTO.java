@@ -1,33 +1,31 @@
 package com.dousheng.api.dto.resp;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Date;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 public class UserInfoDTO {
-    private Long id;
-    private String name;
-    private String password;
-    private String doushengNum;
+    private String id;
+    private String mobile;
+    private String nickname;
+    private String imoocNum;
+    private String face;
     private Integer sex;
     private Date birthday;
     private String country;
     private String province;
     private String city;
     private String district;
-    private String signature;
-    private String avatar;
-    private String backgroundImage;
-    private Integer canDoushengNumBeUpdated;
-    private Date createTime;
-    private Date updateTime;
+    private String description;
+    private String bgImg;
+    private Integer canImoocNumBeUpdated;
+    private Date createdTime;
+    private Date updatedTime;
 
     private String userToken;
 
