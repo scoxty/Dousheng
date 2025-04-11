@@ -23,8 +23,8 @@ import com.dousheng.dto.resp.user.AddUserRespDTO;
 import com.dousheng.dto.resp.user.GetUserInfoRespDTO;
 import com.dousheng.dto.resp.user.ModifyImageRespDTO;
 import com.dousheng.dto.resp.user.ModifyUserInfoRespDTO;
-import com.dousheng.service.FavoriteService;
-import com.dousheng.service.RelationService;
+import com.dousheng.service.FavoriteRpcService;
+import com.dousheng.service.RelationRpcService;
 import com.dousheng.user.common.convention.exception.ClientException;
 import com.dousheng.user.common.convention.exception.RemoteException;
 import com.dousheng.user.common.enums.UserInfoModifyImageTypeEnum;
@@ -41,8 +41,6 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.redisson.executor.ScheduledTasksService;
-import org.springframework.context.annotation.Bean;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -63,9 +61,9 @@ import static com.dousheng.user.common.enums.UserInfoModifyTypeEnum.*;
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements UserService {
 
     @DubboReference(timeout = 4000, retries = 3, loadbalance = "roundrobin")
-    private FavoriteService favoriteService;
+    private FavoriteRpcService favoriteRpcService;
     @DubboReference(timeout = 4000, retries = 3, loadbalance = "roundrobin")
-    private RelationService relationService;
+    private RelationRpcService relationRpcService;
 
     private final RedissonClient redissonClient;
     private final RedisTemplate redisTemplate;
@@ -104,17 +102,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         Integer followsCount = 0, fansCount = 0, totalLikeMeCount = 0;
         Future<Integer> FollowsCountFuture = executorService.submit(() -> {
             GetFollowsCountReqDTO reqDTO = GetFollowsCountReqDTO.builder().userId(requestParam.getUserId()).build();
-            GetFollowsCountRespDTO respDTO = relationService.getFollowsCount(reqDTO);
+            GetFollowsCountRespDTO respDTO = relationRpcService.getFollowsCount(reqDTO);
             return respDTO.getFollowsCount();
         });
         Future<Integer> fansCountFuture = executorService.submit(() -> {
             GetFansCountReqDTO reqDTO = GetFansCountReqDTO.builder().userId(requestParam.getUserId()).build();
-            GetFansCountRespDTO respDTO = relationService.getFansCount(reqDTO);
+            GetFansCountRespDTO respDTO = relationRpcService.getFansCount(reqDTO);
             return respDTO.getFansCount();
         });
         Future<Integer> totalLikeMeCountFuture = executorService.submit(() -> {
             GetTotalLikeMeCountReqDTO reqDTO = GetTotalLikeMeCountReqDTO.builder().userId(requestParam.getUserId()).build();
-            GetTotalLikeMeCountRespDTO respDTO = favoriteService.getTotalLikeMeCount(reqDTO);
+            GetTotalLikeMeCountRespDTO respDTO = favoriteRpcService.getTotalLikeMeCount(reqDTO);
             return respDTO.getTotalLikeMeCount();
         });
 
