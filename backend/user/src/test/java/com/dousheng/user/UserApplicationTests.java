@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.io.*;
 import java.util.Base64;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 class UserApplicationTests {
 
@@ -42,5 +43,10 @@ class UserApplicationTests {
 //        String type = FileTypeUtil.getType(inputStream);
 //
 //        System.out.println("文件类型为: " + type);
+    }
+
+    @Test
+    void testTiemUnit() {
+        System.out.println(TimeUnit.MINUTES.toSeconds(1));
     }
 }

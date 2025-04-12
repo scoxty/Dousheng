@@ -34,7 +34,7 @@ import com.dousheng.user.dao.entity.UserDO;
 import com.dousheng.user.dao.mapper.UserMapper;
 import com.dousheng.user.service.UserService;
 import com.dousheng.user.toolkit.FileUtil;
-import com.google.common.cache.Cache;
+import com.github.benmanes.caffeine.cache.Cache;
 import io.netty.util.internal.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboReference;

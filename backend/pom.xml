@@ -38,6 +38,7 @@
         <hutool-all.version>5.8.20</hutool-all.version>
         <redisson.version>3.21.3</redisson.version>
         <guava.version>30.0-jre</guava.version>
+        <caffeine.version>3.1.8</caffeine.version>
         <dubbo.version>3.2.0</dubbo.version>
         <oss.version>3.15.1</oss.version>
         <transmittable-thread-local.version>2.14.4</transmittable-thread-local.version>
@@ -52,6 +53,7 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Spring Boot相关 -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -60,6 +62,7 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- Spring Cloud相关 -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
@@ -68,67 +71,13 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- Spring Cloud Alibaba相关 -->
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
                 <version>${spring-cloud-alibaba.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-boot-starter</artifactId>
-                <version>${mybatis-plus.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.shardingsphere</groupId>
-                <artifactId>shardingsphere-jdbc-core</artifactId>
-                <version>${shardingsphere.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt</artifactId>
-                <version>${jjwt.version}</version>
-            </dependency>
-
-            <!-- bcrypt加密相关 -->
-            <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-crypto</artifactId>
-                <version>${spring-security-crypto.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.alibaba.fastjson2</groupId>
-                <artifactId>fastjson2</artifactId>
-                <version>${fastjson2.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.github.dozermapper</groupId>
-                <artifactId>dozer-core</artifactId>
-                <version>${dozer-core.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-all</artifactId>
-                <version>${hutool-all.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.redisson</groupId>
-                <artifactId>redisson-spring-boot-starter</artifactId>
-                <version>${redisson.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
             </dependency>
 
             <!-- Dubbo相关 -->
@@ -158,6 +107,34 @@
                 <version>3.24.4</version>
             </dependency>
 
+            <!-- caffeine -->
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
+            </dependency>
+
+            <!-- MyBatis-plus -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+
+            <!-- ShardingSphere -->
+            <dependency>
+                <groupId>org.apache.shardingsphere</groupId>
+                <artifactId>shardingsphere-jdbc-core</artifactId>
+                <version>${shardingsphere.version}</version>
+            </dependency>
+
+            <!-- Redisson -->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson.version}</version>
+            </dependency>
+
             <!-- OSS相关 -->
             <dependency>
                 <groupId>com.aliyun.oss</groupId>
@@ -180,6 +157,41 @@
                 <version>2.3.3</version>
             </dependency>
 
+            <!-- JWT -->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <!-- bcrypt加密相关 -->
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-crypto</artifactId>
+                <version>${spring-security-crypto.version}</version>
+            </dependency>
+
+            <!-- hutool -->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool-all.version}</version>
+            </dependency>
+
+            <!-- fastjson2 -->
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson2.version}</version>
+            </dependency>
+
+            <!-- dozermapper -->
+            <dependency>
+                <groupId>com.github.dozermapper</groupId>
+                <artifactId>dozer-core</artifactId>
+                <version>${dozer-core.version}</version>
+            </dependency>
+
+            <!-- transmittable-thread-local -->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>transmittable-thread-local</artifactId>
