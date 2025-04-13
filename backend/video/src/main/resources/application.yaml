@@ -1,0 +1,26 @@
+server:
+  port: 3003
+
+spring:
+  application:
+    name: video
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: xty510521
+  datasource:
+    url: jdbc:mysql:///dousheng
+    username: root
+    password: xty510521
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+dubbo:
+  application:
+    name: video
+    qos-port: 22225
+  protocol:
+    name: dubbo
+    port: 20883
+  registry:
+    address: nacos://127.0.0.1:8848

@@ -3,7 +3,12 @@ package com.dousheng.api.toolkit;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.dousheng.api.dto.req.ModifyUserInfoReqDTO;
+import com.dousheng.api.dto.req.PublishReqDTO;
 import com.dousheng.api.dto.resp.UserInfoDTO;
+import com.dousheng.api.dto.resp.VideoInfoDTO;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 本人只负责后端实现，为避免改前端牵一发动全身，因此在后端做适配
@@ -80,5 +85,40 @@ public class PackerUtil {
                 .backgroundImage(requestParam.getBgImg())
                 .canDoushengNumBeUpdated(requestParam.getCanImoocNumBeUpdated())
                 .build();
+    }
+
+    public static com.dousheng.dto.common.VideoInfoDTO packRpcVideoInfo(PublishReqDTO requestParam) {
+        Long authorId = null;
+        if (StrUtil.isNotBlank(requestParam.getId())) {
+            authorId = NumberUtil.parseLong(requestParam.getVlogerId());
+        }
+
+        return com.dousheng.dto.common.VideoInfoDTO.builder().
+                authorId(authorId).
+                playUrl(requestParam.getUrl()).
+                coverUrl(requestParam.getCover()).
+                title(requestParam.getTitle()).
+                width(requestParam.getWidth()).
+                height(requestParam.getHeight()).
+                build();
+    }
+
+    public static List<VideoInfoDTO> packApiVideoInfoList(List<com.dousheng.dto.common.VideoInfoDTO> requestParam) {
+        List<VideoInfoDTO> videoInfoDTOList = new ArrayList<>();
+        for (int i = 0; i < requestParam.size(); i++) {
+            com.dousheng.dto.common.VideoInfoDTO videoInfoDTO = requestParam.get(i);
+            videoInfoDTOList.add(VideoInfoDTO.builder().
+                    id(StrUtil.toString(videoInfoDTO.getId())).
+                    vlogerId(StrUtil.toString(videoInfoDTO.getAuthorId())).
+                    url(videoInfoDTO.getPlayUrl()).
+                    cover(videoInfoDTO.getCoverUrl()).
+                    title(videoInfoDTO.getTitle()).
+                    width(videoInfoDTO.getWidth()).
+                    height(videoInfoDTO.getHeight()).
+                    likeCounts(videoInfoDTO.getLikeCounts()).
+                    commentsCounts(videoInfoDTO.getCommentCounts()).
+                    build());
+        }
+        return videoInfoDTOList;
     }
 }

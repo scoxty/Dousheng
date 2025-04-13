@@ -1,4 +1,4 @@
-package com.dousheng.dto.resp.comment;
+package com.dousheng.dto.resp.video;
 
 import lombok.*;
 
@@ -9,8 +9,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class GetVideoCommentCountsRespDTO implements Serializable {
+public class GetWorkCountRespDTO implements Serializable {
     private String code;
     private String message;
-    private Integer commentCounts;
+    private Integer workCount;
 }

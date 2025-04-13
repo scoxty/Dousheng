@@ -1,11 +1,15 @@
 package com.dousheng.api.common.convention.result;
 
+import lombok.Builder;
+
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * 用来返回分页Grid的数据格式
  */
-public class PagedGridResult {
+@Builder
+public class PagedGridResult implements Serializable {
 	
 	private int page;			// 当前页数
 	private long total;			// 总页数
