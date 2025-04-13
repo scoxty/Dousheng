@@ -40,6 +40,7 @@
         <guava.version>30.0-jre</guava.version>
         <caffeine.version>3.1.8</caffeine.version>
         <dubbo.version>3.2.0</dubbo.version>
+        <rocketmq-spring-boot-starter.version>2.2.2</rocketmq-spring-boot-starter.version>
         <oss.version>3.15.1</oss.version>
         <transmittable-thread-local.version>2.14.4</transmittable-thread-local.version>
     </properties>
@@ -78,6 +79,13 @@
                 <version>${spring-cloud-alibaba.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <!-- rocketmq相关 -->
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-spring-boot-starter</artifactId>
+                <version>2.2.2</version>
             </dependency>
 
             <!-- Dubbo相关 -->
