@@ -7,6 +7,7 @@ import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -44,6 +45,7 @@ import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -66,7 +68,6 @@ import static com.dousheng.video.common.enums.YesOrNoEnum.YES;
 @Service
 @RequiredArgsConstructor
 public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implements VideoService {
-    private static final Log log = LogFactory.get();
 
     @DubboReference(timeout = 4000, retries = 3, loadbalance = "roundrobin")
     private UserRpcService userRpcService;
@@ -150,6 +151,50 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
     }
 
     @Override
+    public ChangeVideoToPrivateRespDTO changeVideoToPrivate(ChangeVideoToPrivateReqDTO requestParam) {
+        this.checkParam(requestParam);
+
+        VideoDO videoDO = VideoDO.builder().isPrivate(YES.type).build();
+        LambdaUpdateWrapper<VideoDO> updateWrapper = Wrappers.lambdaUpdate(VideoDO.class)
+                .eq(VideoDO::getId, requestParam.getVideoId())
+                .eq(VideoDO::getAuthorId, requestParam.getUserId());
+        baseMapper.update(videoDO, updateWrapper);
+
+        redisTemplate.delete(String.format(GET_PUBLIC_LIST_KEY, requestParam.getUserId()));
+        publicListLocalCache.invalidate(requestParam.getUserId());
+
+        redisTemplate.delete(String.format(GET_VIDEO_DETAIL_BY_VIDEOID_KEY, requestParam.getVideoId()));
+        videoDetailLocalCache.invalidate(requestParam.getVideoId());
+
+        return ChangeVideoToPrivateRespDTO.builder().
+                code(SUCCESS_CODE).
+                message(SUCCESS_MESSAGE).
+                build();
+    }
+
+    @Override
+    public ChangeVideoToPublicRespDTO changeVideoToPublic(ChangeVideoToPublicReqDTO requestParam) {
+        this.checkParam(requestParam);
+
+        VideoDO videoDO = VideoDO.builder().isPrivate(NO.type).build();
+        LambdaUpdateWrapper<VideoDO> updateWrapper = Wrappers.lambdaUpdate(VideoDO.class)
+                .eq(VideoDO::getId, requestParam.getVideoId())
+                .eq(VideoDO::getAuthorId, requestParam.getUserId());
+        baseMapper.update(videoDO, updateWrapper);
+
+        redisTemplate.delete(String.format(GET_PUBLIC_LIST_KEY, requestParam.getUserId()));
+        publicListLocalCache.invalidate(requestParam.getUserId());
+
+        redisTemplate.delete(String.format(GET_VIDEO_DETAIL_BY_VIDEOID_KEY, requestParam.getVideoId()));
+        videoDetailLocalCache.invalidate(requestParam.getVideoId());
+
+        return ChangeVideoToPublicRespDTO.builder().
+                code(SUCCESS_CODE).
+                message(SUCCESS_MESSAGE).
+                build();
+    }
+
+    @Override
     public GetPublicListRespDTO getPublicList(GetPublicListReqDTO requestParam) {
         this.checkParam(requestParam);
 
@@ -164,6 +209,9 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
         List<VideoInfoDTO> videoInfoDTOList = new ArrayList<>();
         for (int i = 0; i < videoDOList.size(); i++) {
             VideoDO videoDO = videoDOList.get(i);
+            if (videoDO.getIsPrivate().equals(YES.type)) {
+                continue; // 跳过私有视频
+            }
             VideoInfoDTO videoInfoDTO = BeanUtil.copyProperties(videoDO, VideoInfoDTO.class);
             Integer likeCounts = 0, commentCounts = 0;
 
@@ -201,6 +249,57 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
     }
 
     @Override
+    public GetPrivateListRespDTO getPrivateList(GetPrivateListReqDTO requestParam) {
+        this.checkParam(requestParam);
+
+        Page<VideoDO> pageReq = new Page<>(requestParam.getPage(), requestParam.getPageSize());
+        LambdaQueryWrapper<VideoDO> queryWrapper = Wrappers.lambdaQuery(VideoDO.class)
+                .eq(VideoDO::getAuthorId, requestParam.getUserId())
+                .eq(VideoDO::getIsPrivate, requestParam.getIsPrivate())
+                .orderByDesc(VideoDO::getCreateTime);
+        List<VideoDO> videoDOList = baseMapper.selectPage(pageReq, queryWrapper).getRecords();
+
+        List<VideoInfoDTO> videoInfoDTOList = BeanUtil.copyToList(videoDOList, VideoInfoDTO.class);
+        for (VideoInfoDTO videoInfoDTO : videoInfoDTOList) {
+            if (videoInfoDTO.getIsPrivate().equals(NO.type)) {
+                continue; // 跳过非私有视频
+            }
+
+            Integer likeCounts, commentCounts = 0;
+
+            Future<Integer> likeCountsFuture = executorService.submit(() -> {
+                GetVideoLikeCountsReqDTO getVideoLikeCountsReqDTO = GetVideoLikeCountsReqDTO.builder().videoId(videoInfoDTO.getId()).build();
+                GetVideoLikeCountsRespDTO getVideoLikeCountsRespDTO = favoriteRpcService.getVideoLikeCounts(getVideoLikeCountsReqDTO);
+                return getVideoLikeCountsRespDTO.getLikeCounts();
+            });
+            Future<Integer> commentCountsFuture = executorService.submit(() -> {
+                GetVideoCommentCountsReqDTO getVideoCommentCountsReqDTO = GetVideoCommentCountsReqDTO.builder().videoId(videoInfoDTO.getId()).build();
+                GetVideoCommentCountsRespDTO getVideoCommentCountsRespDTO = commentRpcService.getVideoCommentCounts(getVideoCommentCountsReqDTO);
+                return getVideoCommentCountsRespDTO.getCommentCounts();
+            });
+
+            try {
+                likeCounts = likeCountsFuture.get(4, TimeUnit.SECONDS);
+                commentCounts = commentCountsFuture.get(4, TimeUnit.SECONDS);
+            } catch (Exception e) {
+                throw new RemoteException(e.getMessage());
+            }
+
+            videoInfoDTO.setLikeCounts(likeCounts);
+            videoInfoDTO.setCommentCounts(commentCounts);
+        }
+
+        return GetPrivateListRespDTO.builder().
+                code(SUCCESS_CODE).
+                message(SUCCESS_MESSAGE).
+                page(requestParam.getPage()).
+                totalPage((int) pageReq.getPages()).
+                totalCount((int) pageReq.getTotal()).
+                videoList(videoInfoDTOList).
+                build();
+    }
+
+    @Override
     public GetVideoDetailRespDTO getVideoDetail(GetVideoDetailReqDTO requestParam) {
         this.checkParam(requestParam);
 
@@ -209,6 +308,9 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
         }
 
         VideoDO videoDO = this.getBaseVideoDetail(requestParam);
+        if (videoDO.getIsPrivate().equals(YES.type) && !requestParam.getUserId().equals(videoDO.getAuthorId())) {
+            throw new ServiceException(NO_PERMISSION);
+        }
         VideoInfoDTO videoInfoDTO = BeanUtil.copyProperties(videoDO, VideoInfoDTO.class);
 
         Boolean isFavorite = false, isFollow = false;
@@ -359,13 +461,8 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
             throw new ClientException(USER_ID_NULL);
         }
 
-        if (requestParam.getPage() == null) {
-            log.warn("[getWorkCount][checkParam] page is null, set default value: {}; req={}", COMMON_START_PAGE, requestParam);
-            requestParam.setPage(COMMON_START_PAGE);
-        }
-        if (requestParam.getPageSize() == null) {
-            log.warn("[getWorkCount][checkParam] pageSize is null, set default value: {}; req={}", COMMON_PAGE_SIZE, requestParam);
-            requestParam.setPageSize(COMMON_PAGE_SIZE);
+        if (requestParam.getPage() == null || requestParam.getPageSize() == null) {
+            throw new ClientException(PAGE_PARAM_NULL);
         }
 
         if (requestParam.getIsPrivate() == null) {
@@ -407,6 +504,48 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
         }
         if (requestParam.getUserId() == null) {
             throw new ClientException(USER_ID_NULL);
+        }
+    }
+
+    public void checkParam(ChangeVideoToPrivateReqDTO requestParam) {
+        if (requestParam == null) {
+            throw new ClientException(REQUEST_PARAM_NULL);
+        }
+        if (requestParam.getUserId() == null) {
+            throw new ClientException(USER_ID_NULL);
+        }
+        if (requestParam.getVideoId() == null) {
+            throw new ClientException(VIDEO_ID_NULL);
+        }
+    }
+
+    public void checkParam(ChangeVideoToPublicReqDTO requestParam) {
+        if (requestParam == null) {
+            throw new ClientException(REQUEST_PARAM_NULL);
+        }
+        if (requestParam.getUserId() == null) {
+            throw new ClientException(USER_ID_NULL);
+        }
+        if (requestParam.getVideoId() == null) {
+            throw new ClientException(VIDEO_ID_NULL);
+        }
+    }
+
+    public void checkParam(GetPrivateListReqDTO requestParam) {
+        if (requestParam == null) {
+            throw new ClientException(REQUEST_PARAM_NULL);
+        }
+        if (requestParam.getUserId() == null) {
+            throw new ClientException(USER_ID_NULL);
+        }
+        if (requestParam.getPage() == null || requestParam.getPageSize() == null) {
+            throw new ClientException(PAGE_PARAM_NULL);
+        }
+        if (requestParam.getIsPrivate() == null) {
+            throw new ClientException(IS_PRIVATE_NULL);
+        }
+        if (requestParam.getIsPrivate().equals(NO.type)) {
+            throw new ClientException(NO_PERMISSION);
         }
     }
 

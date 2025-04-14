@@ -41,6 +41,46 @@ public class VideoServiceHandler implements VideoRpcService {
     }
 
     @Override
+    public ChangeVideoToPrivateRespDTO changeVideoToPrivate(ChangeVideoToPrivateReqDTO requestParam) {
+        ChangeVideoToPrivateRespDTO respDTO = new ChangeVideoToPrivateRespDTO();
+        try {
+            respDTO = videoService.changeVideoToPrivate(requestParam);
+            log.info("[changeVideoToPrivate] success: req={}, resp={}", requestParam, respDTO);
+        } catch (AbstractException e) {
+            // 已知业务异常处理
+            respDTO.setCode(e.getErrorCode());
+            respDTO.setMessage(e.getErrorMessage());
+            log.error("[changeVideoToPrivate] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        } catch (Throwable e) {
+            // 未知系统异常处理
+            respDTO.setCode(BaseErrorCode.SERVICE_ERROR.code());
+            respDTO.setMessage(BaseErrorCode.SERVICE_ERROR.message());
+            log.error("[changeVideoToPrivate] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        }
+        return respDTO;
+    }
+
+    @Override
+    public ChangeVideoToPublicRespDTO changeVideoToPublic(ChangeVideoToPublicReqDTO requestParam) {
+        ChangeVideoToPublicRespDTO respDTO = new ChangeVideoToPublicRespDTO();
+        try {
+            respDTO = videoService.changeVideoToPublic(requestParam);
+            log.info("[changeVideoToPublic] success: req={}, resp={}", requestParam, respDTO);
+        } catch (AbstractException e) {
+            // 已知业务异常处理
+            respDTO.setCode(e.getErrorCode());
+            respDTO.setMessage(e.getErrorMessage());
+            log.error("[changeVideoToPublic] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        } catch (Throwable e) {
+            // 未知系统异常处理
+            respDTO.setCode(BaseErrorCode.SERVICE_ERROR.code());
+            respDTO.setMessage(BaseErrorCode.SERVICE_ERROR.message());
+            log.error("[changeVideoToPublic] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        }
+        return respDTO;
+    }
+
+    @Override
     public GetPublicListRespDTO getPublicList(GetPublicListReqDTO requestParam) {
         GetPublicListRespDTO respDTO = new GetPublicListRespDTO();
         try {
@@ -56,6 +96,26 @@ public class VideoServiceHandler implements VideoRpcService {
             respDTO.setCode(BaseErrorCode.SERVICE_ERROR.code());
             respDTO.setMessage(BaseErrorCode.SERVICE_ERROR.message());
             log.error("[getPublicList] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        }
+        return respDTO;
+    }
+
+    @Override
+    public GetPrivateListRespDTO getPrivateList(GetPrivateListReqDTO requestParam) {
+        GetPrivateListRespDTO respDTO = new GetPrivateListRespDTO();
+        try {
+            respDTO = videoService.getPrivateList(requestParam);
+            log.info("[getPrivateList] success: req={}, resp={}", requestParam, respDTO);
+        } catch (AbstractException e) {
+            // 已知业务异常处理
+            respDTO.setCode(e.getErrorCode());
+            respDTO.setMessage(e.getErrorMessage());
+            log.error("[getPrivateList] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        } catch (Throwable e) {
+            // 未知系统异常处理
+            respDTO.setCode(BaseErrorCode.SERVICE_ERROR.code());
+            respDTO.setMessage(BaseErrorCode.SERVICE_ERROR.message());
+            log.error("[getPrivateList] error: req={}, resp={}, err={}", requestParam, respDTO, e);
         }
         return respDTO;
     }
@@ -119,4 +179,5 @@ public class VideoServiceHandler implements VideoRpcService {
         }
         return respDTO;
     }
+
 }

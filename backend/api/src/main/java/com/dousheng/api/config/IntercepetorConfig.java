@@ -66,7 +66,6 @@ public class IntercepetorConfig implements WebMvcConfigurer {
                 "/userInfo/modifyUserInfo",
                 "/userInfo/modifyImage",
                 "/vlog/publish",
-                "/vlog/detail",
                 "/vlog/changeToPrivate",
                 "/vlog/changeToPublic",
                 "/vlog/myPrivateList",

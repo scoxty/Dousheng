@@ -149,4 +149,23 @@ public class PackerUtil {
         }
         return indexVideoDTOList;
     }
+
+    public static IndexVideoDTO packApiVideoDetail(com.dousheng.dto.common.VideoInfoDTO videoInfoDTO) {
+        return IndexVideoDTO.builder().
+                vlogId(StrUtil.toString(videoInfoDTO.getId())).
+                vlogerId(StrUtil.toString(videoInfoDTO.getAuthorId())).
+                vlogerName(videoInfoDTO.getAuthorName()).
+                vlogerFace(videoInfoDTO.getAuthorAvatar()).
+                url(videoInfoDTO.getPlayUrl()).
+                cover(videoInfoDTO.getCoverUrl()).
+                content(videoInfoDTO.getTitle()).
+                width(videoInfoDTO.getWidth()).
+                height(videoInfoDTO.getHeight()).
+                likeCounts(videoInfoDTO.getLikeCounts()).
+                commentsCounts(videoInfoDTO.getCommentCounts()).
+                isPrivate(videoInfoDTO.getIsPrivate()).
+                doIFollowVloger(videoInfoDTO.getIsFollow()).
+                doILikeThisVlog(videoInfoDTO.getIsFavorite()).
+                build();
+    }
 }
