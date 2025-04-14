@@ -16,27 +16,57 @@ import java.util.concurrent.TimeUnit;
 public class LocalCacheConfig {
 
     @Bean
-    public Cache<String, List<VideoDO>> publishListLocalCache() {
+    public Cache<Long, List<VideoDO>> publicListLocalCache() {
         return Caffeine.newBuilder()
                 .maximumSize(1024)
-                .expireAfter(new Expiry<String, List<VideoDO>>() {
+                .expireAfter(new Expiry<Long, List<VideoDO>>() {
                     private final long base = TimeUnit.MINUTES.toNanos(30);
                     private final long bound = TimeUnit.SECONDS.toNanos(30);
 
                     @Override
-                    public long expireAfterCreate(String key, List<VideoDO> videoDOS, long l) {
+                    public long expireAfterCreate(Long userId, List<VideoDO> publicList, long l) {
                         long jitter = ThreadLocalRandom.current().nextLong(bound + 1);
                         return base + jitter;
                     }
 
                     @Override
-                    public long expireAfterUpdate(String key, List<VideoDO> videoDOS, long l, @NonNegative long l1) {
+                    public long expireAfterUpdate(Long userId, List<VideoDO> publicList, long l, @NonNegative long l1) {
                         long jitter = ThreadLocalRandom.current().nextLong(bound + 1);
                         return base + jitter;
                     }
 
                     @Override
-                    public long expireAfterRead(String key, List<VideoDO> videoDOS, long l, @NonNegative long l1) {
+                    public long expireAfterRead(Long userId, List<VideoDO> publicList, long l, @NonNegative long l1) {
+                        long jitter = ThreadLocalRandom.current().nextLong(bound + 1);
+                        return base + jitter;
+                    }
+                })
+                .build();
+    }
+
+    @Bean
+    public Cache<Long, VideoDO> videoDetailLocalCache() {
+        return Caffeine.newBuilder()
+                .maximumSize(1024)
+                .expireAfter(new Expiry<Long, VideoDO>() {
+
+                    private final long base = TimeUnit.MINUTES.toNanos(30);
+                    private final long bound = TimeUnit.SECONDS.toNanos(30);
+
+                    @Override
+                    public long expireAfterCreate(Long videoId, VideoDO videoDO, long l) {
+                        long jitter = ThreadLocalRandom.current().nextLong(bound + 1);
+                        return base + jitter;
+                    }
+
+                    @Override
+                    public long expireAfterUpdate(Long videoId, VideoDO videoDO, long l, @NonNegative long l1) {
+                        long jitter = ThreadLocalRandom.current().nextLong(bound + 1);
+                        return base + jitter;
+                    }
+
+                    @Override
+                    public long expireAfterRead(Long videoId, VideoDO videoDO, long l, @NonNegative long l1) {
                         long jitter = ThreadLocalRandom.current().nextLong(bound + 1);
                         return base + jitter;
                     }

@@ -2,13 +2,8 @@ package com.dousheng.video.handler;
 
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
-import com.dousheng.dto.req.video.GetPublishListReqDTO;
-import com.dousheng.dto.req.video.GetWorkCountReqDTO;
-import com.dousheng.dto.req.video.PublishReqDTO;
-import com.dousheng.dto.resp.user.GetUserInfoRespDTO;
-import com.dousheng.dto.resp.video.GetPublishListRespDTO;
-import com.dousheng.dto.resp.video.GetWorkCountRespDTO;
-import com.dousheng.dto.resp.video.PublishRespDTO;
+import com.dousheng.dto.req.video.*;
+import com.dousheng.dto.resp.video.*;
 import com.dousheng.service.VideoRpcService;
 import com.dousheng.video.common.convention.errorcode.BaseErrorCode;
 import com.dousheng.video.common.convention.exception.AbstractException;
@@ -46,21 +41,61 @@ public class VideoServiceHandler implements VideoRpcService {
     }
 
     @Override
-    public GetPublishListRespDTO getPublishList(GetPublishListReqDTO requestParam) {
-        GetPublishListRespDTO respDTO = new GetPublishListRespDTO();
+    public GetPublicListRespDTO getPublicList(GetPublicListReqDTO requestParam) {
+        GetPublicListRespDTO respDTO = new GetPublicListRespDTO();
         try {
-            respDTO = videoService.getPublishList(requestParam);
-            log.info("[getPublishList] success: req={}, resp={}", requestParam, respDTO);
+            respDTO = videoService.getPublicList(requestParam);
+            log.info("[getPublicList] success: req={}, resp={}", requestParam, respDTO);
         } catch (AbstractException e) {
             // 已知业务异常处理
             respDTO.setCode(e.getErrorCode());
             respDTO.setMessage(e.getErrorMessage());
-            log.error("[getPublishList] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+            log.error("[getPublicList] error: req={}, resp={}, err={}", requestParam, respDTO, e);
         } catch (Throwable e) {
             // 未知系统异常处理
             respDTO.setCode(BaseErrorCode.SERVICE_ERROR.code());
             respDTO.setMessage(BaseErrorCode.SERVICE_ERROR.message());
-            log.error("[getPublishList] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+            log.error("[getPublicList] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        }
+        return respDTO;
+    }
+
+    @Override
+    public GetVideoDetailRespDTO getVideoDetail(GetVideoDetailReqDTO requestParam) {
+        GetVideoDetailRespDTO respDTO = new GetVideoDetailRespDTO();
+        try {
+            respDTO = videoService.getVideoDetail(requestParam);
+            log.info("[getVideoDetail] success: req={}, resp={}", requestParam, respDTO);
+        } catch (AbstractException e) {
+            // 已知业务异常处理
+            respDTO.setCode(e.getErrorCode());
+            respDTO.setMessage(e.getErrorMessage());
+            log.error("[getVideoDetail] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        } catch (Throwable e) {
+            // 未知系统异常处理
+            respDTO.setCode(BaseErrorCode.SERVICE_ERROR.code());
+            respDTO.setMessage(BaseErrorCode.SERVICE_ERROR.message());
+            log.error("[getVideoDetail] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        }
+        return respDTO;
+    }
+
+    @Override
+    public GetVideoDetailListRespDTO getVideoDetailList(GetVideoDetailListReqDTO requestParam) {
+        GetVideoDetailListRespDTO respDTO = new GetVideoDetailListRespDTO();
+        try {
+            respDTO = videoService.getVideoDetailList(requestParam);
+            log.info("[getVideoDetailList] success: req={}, resp={}", requestParam, respDTO);
+        } catch (AbstractException e) {
+            // 已知业务异常处理
+            respDTO.setCode(e.getErrorCode());
+            respDTO.setMessage(e.getErrorMessage());
+            log.error("[getVideoDetailList] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        } catch (Throwable e) {
+            // 未知系统异常处理
+            respDTO.setCode(BaseErrorCode.SERVICE_ERROR.code());
+            respDTO.setMessage(BaseErrorCode.SERVICE_ERROR.message());
+            log.error("[getVideoDetailList] error: req={}, resp={}, err={}", requestParam, respDTO, e);
         }
         return respDTO;
     }

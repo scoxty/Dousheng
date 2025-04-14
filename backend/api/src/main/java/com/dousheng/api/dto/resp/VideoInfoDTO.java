@@ -2,6 +2,8 @@ package com.dousheng.api.dto.resp;
 
 import lombok.*;
 
+import java.util.Date;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -17,4 +19,7 @@ public class VideoInfoDTO {
     private Integer height;
     private Integer likeCounts;
     private Integer commentsCounts;
+    private Integer isPrivate;
+    private Date createdTime;
+    private Date updatedTime;
 }

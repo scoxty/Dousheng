@@ -23,6 +23,8 @@ public class VideoInfoDTO implements Serializable {
     private Integer likeCounts;
     private Integer commentCounts;
     private Integer isPrivate;
+    private Boolean isFollow;
+    private Boolean isFavorite;
     private Date createTime;
     private Date updateTime;
 }

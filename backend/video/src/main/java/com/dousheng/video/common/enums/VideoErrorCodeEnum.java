@@ -9,7 +9,12 @@ public enum VideoErrorCodeEnum implements IErrorCode {
     VIDEO_INFO_NULL("A000303", "视频信息不能为空"),
     NO_PERMISSION("A000304", "没有权限"),
     PAGE_PARAM_NULL("A000305", "分页参数不能为空"),
-    IS_PRIVATE_NULL("A000306", "是否私密字段不能为空");
+    IS_PRIVATE_NULL("A000306", "是否私密字段不能为空"),
+    VIDEO_ID_NULL("A000307", "视频id不能为空"),
+    VIDEO_ID_LIST_NULL("A000308", "视频id列表不能为空"),
+
+    VIDEO_NOT_EXIST("B000300", "视频不存在"),
+    AUTHOR_NOT_EXIST("B000400", "作者不存在");
 
     private final String code;
 

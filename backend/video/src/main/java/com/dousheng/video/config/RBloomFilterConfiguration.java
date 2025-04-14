@@ -17,4 +17,11 @@ public class RBloomFilterConfiguration {
         cachePenetrationBloomFilter.tryInit(100000000L, 0.001);
         return cachePenetrationBloomFilter;
     }
+
+    @Bean
+    public RBloomFilter<Long> videoIdCachePenetrationBloomFilter(RedissonClient redissonClient) {
+        RBloomFilter<Long> cachePenetrationBloomFilter = redissonClient.getBloomFilter("videoIdCachePenetrationBloomFilter");
+        cachePenetrationBloomFilter.tryInit(100000000L, 0.001);
+        return cachePenetrationBloomFilter;
+    }
 }
