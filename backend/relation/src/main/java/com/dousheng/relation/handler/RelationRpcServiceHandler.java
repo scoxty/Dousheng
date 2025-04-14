@@ -2,8 +2,10 @@ package com.dousheng.relation.handler;
 
 import com.dousheng.dto.req.relation.GetFansCountReqDTO;
 import com.dousheng.dto.req.relation.GetFollowsCountReqDTO;
+import com.dousheng.dto.req.relation.IsFollowReqDTO;
 import com.dousheng.dto.resp.relation.GetFansCountRespDTO;
 import com.dousheng.dto.resp.relation.GetFollowsCountRespDTO;
+import com.dousheng.dto.resp.relation.IsFollowRespDTO;
 import com.dousheng.service.RelationRpcService;
 import org.apache.dubbo.config.annotation.DubboService;
 
@@ -18,6 +20,12 @@ public class RelationRpcServiceHandler implements RelationRpcService {
     @Override
     public GetFansCountRespDTO getFansCount(GetFansCountReqDTO requestParam) {
         GetFansCountRespDTO mockResp = GetFansCountRespDTO.builder().code("0").message("success").fansCount(0).build();
+        return mockResp;
+    }
+
+    @Override
+    public IsFollowRespDTO isFollow(IsFollowReqDTO requestParam) {
+        IsFollowRespDTO mockResp = IsFollowRespDTO.builder().code("0").message("success").isFollow(false).build();
         return mockResp;
     }
 }

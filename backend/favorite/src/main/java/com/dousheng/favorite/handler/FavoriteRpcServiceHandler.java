@@ -2,8 +2,10 @@ package com.dousheng.favorite.handler;
 
 import com.dousheng.dto.req.favorite.GetTotalLikeMeCountReqDTO;
 import com.dousheng.dto.req.favorite.GetVideoLikeCountsReqDTO;
+import com.dousheng.dto.req.favorite.IsLikeVideoReqDTO;
 import com.dousheng.dto.resp.favorite.GetTotalLikeMeCountRespDTO;
 import com.dousheng.dto.resp.favorite.GetVideoLikeCountsRespDTO;
+import com.dousheng.dto.resp.favorite.IsLikeVideoRespDTO;
 import com.dousheng.service.FavoriteRpcService;
 import org.apache.dubbo.config.annotation.DubboService;
 
@@ -18,6 +20,12 @@ public class FavoriteRpcServiceHandler implements FavoriteRpcService {
     @Override
     public GetVideoLikeCountsRespDTO getVideoLikeCounts(GetVideoLikeCountsReqDTO requestParam) {
         GetVideoLikeCountsRespDTO mockResp = GetVideoLikeCountsRespDTO.builder().code("0").message("success").likeCounts(0).build();
+        return mockResp;
+    }
+
+    @Override
+    public IsLikeVideoRespDTO isLikeVideo(IsLikeVideoReqDTO requestParam) {
+        IsLikeVideoRespDTO mockResp = IsLikeVideoRespDTO.builder().code("0").message("success").isLike(false).build();
         return mockResp;
     }
 }

@@ -4,6 +4,7 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.dousheng.api.dto.req.ModifyUserInfoReqDTO;
 import com.dousheng.api.dto.req.PublishReqDTO;
+import com.dousheng.api.dto.resp.IndexVideoDTO;
 import com.dousheng.api.dto.resp.UserInfoDTO;
 import com.dousheng.api.dto.resp.VideoInfoDTO;
 
@@ -103,7 +104,7 @@ public class PackerUtil {
                 build();
     }
 
-    public static List<VideoInfoDTO> packApiVideoInfoList(List<com.dousheng.dto.common.VideoInfoDTO> requestParam) {
+    public static List<VideoInfoDTO> packApiPublishList(List<com.dousheng.dto.common.VideoInfoDTO> requestParam) {
         List<VideoInfoDTO> videoInfoDTOList = new ArrayList<>();
         for (int i = 0; i < requestParam.size(); i++) {
             com.dousheng.dto.common.VideoInfoDTO videoInfoDTO = requestParam.get(i);
@@ -117,8 +118,35 @@ public class PackerUtil {
                     height(videoInfoDTO.getHeight()).
                     likeCounts(videoInfoDTO.getLikeCounts()).
                     commentsCounts(videoInfoDTO.getCommentCounts()).
+                    isPrivate(videoInfoDTO.getIsPrivate()).
+                    createdTime(videoInfoDTO.getCreateTime()).
+                    updatedTime(videoInfoDTO.getUpdateTime()).
                     build());
         }
         return videoInfoDTOList;
+    }
+
+    public static List<IndexVideoDTO> packApiIndexFeed(List<com.dousheng.dto.common.VideoInfoDTO> requestParam) {
+        List<IndexVideoDTO> indexVideoDTOList = new ArrayList<>();
+        for (int i = 0; i < requestParam.size(); i++) {
+            com.dousheng.dto.common.VideoInfoDTO videoInfoDTO = requestParam.get(i);
+            indexVideoDTOList.add(IndexVideoDTO.builder().
+                    vlogId(StrUtil.toString(videoInfoDTO.getId())).
+                    vlogerId(StrUtil.toString(videoInfoDTO.getAuthorId())).
+                    vlogerName(videoInfoDTO.getAuthorName()).
+                    vlogerFace(videoInfoDTO.getAuthorAvatar()).
+                    url(videoInfoDTO.getPlayUrl()).
+                    cover(videoInfoDTO.getCoverUrl()).
+                    content(videoInfoDTO.getTitle()).
+                    width(videoInfoDTO.getWidth()).
+                    height(videoInfoDTO.getHeight()).
+                    likeCounts(videoInfoDTO.getLikeCounts()).
+                    commentsCounts(videoInfoDTO.getCommentCounts()).
+                    isPrivate(videoInfoDTO.getIsPrivate()).
+                    doIFollowVloger(videoInfoDTO.getIsFollow()).
+                    doILikeThisVlog(videoInfoDTO.getIsFavorite()).
+                    build());
+        }
+        return indexVideoDTOList;
     }
 }

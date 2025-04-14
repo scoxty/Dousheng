@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class GetPublishListRespDTO implements Serializable {
+public class GetPublicListRespDTO implements Serializable {
     private String code;
     private String message;
     private Integer page;			// 当前页数

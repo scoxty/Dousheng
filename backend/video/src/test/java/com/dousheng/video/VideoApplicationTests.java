@@ -1,5 +1,8 @@
 package com.dousheng.video;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.dousheng.dto.common.VideoInfoDTO;
+import com.dousheng.video.dao.entity.VideoDO;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 

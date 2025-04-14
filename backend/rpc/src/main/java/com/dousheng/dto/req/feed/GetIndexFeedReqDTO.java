@@ -1,4 +1,4 @@
-package com.dousheng.dto.req.video;
+package com.dousheng.dto.req.feed;
 
 import lombok.*;
 
@@ -9,9 +9,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class GetPublishListReqDTO implements Serializable {
+public class GetIndexFeedReqDTO implements Serializable {
     private Long userId;
     private Integer page;
     private Integer pageSize;
-    private Integer isPrivate;
 }

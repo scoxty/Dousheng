@@ -1,7 +1,6 @@
 package com.dousheng.api.controller;
 
 import cn.hutool.core.util.NumberUtil;
-import cn.hutool.db.Page;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import com.dousheng.api.common.biz.user.UserContext;
@@ -9,12 +8,10 @@ import com.dousheng.api.common.convention.result.PagedGridResult;
 import com.dousheng.api.common.convention.result.Result;
 import com.dousheng.api.common.convention.result.Results;
 import com.dousheng.api.dto.req.PublishReqDTO;
-import com.dousheng.api.dto.resp.UserInfoDTO;
 import com.dousheng.api.toolkit.PackerUtil;
-import com.dousheng.dto.req.video.GetPublishListReqDTO;
-import com.dousheng.dto.resp.video.GetPublishListRespDTO;
+import com.dousheng.dto.req.video.GetPublicListReqDTO;
+import com.dousheng.dto.resp.video.GetPublicListRespDTO;
 import com.dousheng.dto.resp.video.PublishRespDTO;
-import com.dousheng.service.UserRpcService;
 import com.dousheng.service.VideoRpcService;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
@@ -47,19 +44,19 @@ public class VideoController {
     public Result<PagedGridResult> getMyPublicList(@RequestParam String userId,
                                                    @RequestParam Integer page,
                                                    @RequestParam Integer pageSize) {
-        GetPublishListReqDTO reqDTO = GetPublishListReqDTO.builder().
+        GetPublicListReqDTO reqDTO = GetPublicListReqDTO.builder().
                 userId(NumberUtil.parseLong(userId)).
                 page(page).
                 pageSize(pageSize).
                 isPrivate(NO.type).
                 build();
-        GetPublishListRespDTO respDTO = videoRpcService.getPublishList(reqDTO);
+        GetPublicListRespDTO respDTO = videoRpcService.getPublicList(reqDTO);
         if (respDTO.getCode().equals(SUCCESS_CODE)) {
             PagedGridResult pagedGridResult = PagedGridResult.builder().
                     page(respDTO.getPage()).
                     total(respDTO.getTotalPage()).
                     records(respDTO.getTotalCount()).
-                    rows(PackerUtil.packApiVideoInfoList(respDTO.getVideoList())).
+                    rows(PackerUtil.packApiPublishList(respDTO.getVideoList())).
                     build();
             log.info("[getMyPublicList] success: req={}, resp={}", reqDTO, Results.success(pagedGridResult));
             return Results.success(pagedGridResult);
