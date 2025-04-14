@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Objects;
+
 import static com.dousheng.api.common.constant.SuccessBaseRespConstant.SUCCESS_CODE;
 
 @RestController
@@ -30,7 +32,7 @@ public class FeedController {
                                                 @RequestParam Integer page,
                                                 @RequestParam Integer pageSize) {
         GetIndexFeedReqDTO reqDTO = GetIndexFeedReqDTO.builder().
-                userId(NumberUtil.parseLong(userId)).
+                userId(Objects.equals(userId, "") ? null : NumberUtil.parseLong(userId)).
                 page(page).
                 pageSize(pageSize).
                 build();

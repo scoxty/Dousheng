@@ -8,6 +8,8 @@ public enum FeedErrorCodeEnum implements IErrorCode {
     LIKE_COUNTS_IS_NULL("A000302", "点赞数为空"),
     COMMENT_COUNTS_IS_NULL("A000303", "评论数为空"),
     CREATE_TIME_IS_NULL("A000304", "创建时间为空"),
+    REQUEST_PARAM_IS_NULL("A000305", "请求参数为空"),
+    PAGE_PARAM_NULL("A000306", "分页参数为空"),
 
     FEED_LIST_EMPTY("B000300", "视频列表为空");
 

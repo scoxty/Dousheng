@@ -20,6 +20,7 @@ import com.dousheng.dto.resp.feed.GetIndexFeedRespDTO;
 import com.dousheng.dto.resp.relation.IsFollowRespDTO;
 import com.dousheng.dto.resp.user.GetUserInfoRespDTO;
 import com.dousheng.dto.resp.video.GetVideoDetailListRespDTO;
+import com.dousheng.feed.common.convention.exception.ClientException;
 import com.dousheng.feed.common.convention.exception.RemoteException;
 import com.dousheng.feed.common.convention.exception.ServiceException;
 import com.dousheng.feed.service.FeedService;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
 import static com.dousheng.feed.common.constant.RedisCacheConstant.GLOBAL_HOT_VIDEO_KEY;
 import static com.dousheng.feed.common.constant.SuccessBaseRespConstant.SUCCESS_CODE;
 import static com.dousheng.feed.common.constant.SuccessBaseRespConstant.SUCCESS_MESSAGE;
-import static com.dousheng.feed.common.enums.FeedErrorCodeEnum.FEED_LIST_EMPTY;
+import static com.dousheng.feed.common.enums.FeedErrorCodeEnum.*;
 
 @Service
 @RequiredArgsConstructor
@@ -65,6 +66,8 @@ public class FeedServiceImpl implements FeedService {
      */
     @Override
     public GetIndexFeedRespDTO getIndexFeed(GetIndexFeedReqDTO requestParam) {
+        this.checkParam(requestParam);
+
         int start = (requestParam.getPage() - 1) * requestParam.getPageSize();
         int end = start + requestParam.getPageSize() - 1;
         Set<Object> rawSet = redisTemplate.opsForZSet().reverseRange(GLOBAL_HOT_VIDEO_KEY, start, end);
@@ -102,5 +105,14 @@ public class FeedServiceImpl implements FeedService {
                 build();
     }
 
+    public void checkParam(GetIndexFeedReqDTO requestParam) {
+        if (requestParam == null) {
+            throw new ClientException(REQUEST_PARAM_IS_NULL);
+        }
+
+        if (requestParam.getPage() == null || requestParam.getPageSize() == null) {
+            throw new ClientException(PAGE_PARAM_NULL);
+        }
+    }
 
 }
