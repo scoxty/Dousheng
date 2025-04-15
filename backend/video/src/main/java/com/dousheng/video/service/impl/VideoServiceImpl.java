@@ -406,6 +406,7 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
         workCount = (Integer) redisTemplate.opsForValue().get(String.format(GET_WORKCOUNT_BY_AUTHORID_KEY, requestParam.getUserId()));
         if (workCount != null) {
             respDTO.setWorkCount(workCount);
+            workCountLocalCache.put(requestParam.getUserId(), workCount);
             return respDTO;
         }
 
@@ -415,6 +416,7 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
             workCount = (Integer) redisTemplate.opsForValue().get(String.format(GET_WORKCOUNT_BY_AUTHORID_KEY, requestParam.getUserId()));
             if (workCount != null) {
                 respDTO.setWorkCount(workCount);
+                workCountLocalCache.put(requestParam.getUserId(), workCount);
                 return respDTO;
             }
 
@@ -571,6 +573,10 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
 
         videoDOList = getPublicListFromRedis(requestParam);
         if (CollectionUtil.isNotEmpty(videoDOList)) {
+            // LocalCache只对第一页做缓存
+            if (requestParam.getPage() <= 1) {
+                publicListLocalCache.put(requestParam.getUserId(), videoDOList);
+            }
             return videoDOList;
         }
 
@@ -579,6 +585,10 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
         try {
             videoDOList = getPublicListFromRedis(requestParam);
             if (CollectionUtil.isNotEmpty(videoDOList)) {
+                // LocalCache只对第一页做缓存
+                if (requestParam.getPage() <= 1) {
+                    publicListLocalCache.put(requestParam.getUserId(), videoDOList);
+                }
                 return videoDOList;
             }
 
@@ -658,6 +668,7 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
         String videoJsonStr = (String) redisTemplate.opsForValue().get(String.format(GET_VIDEO_DETAIL_BY_VIDEOID_KEY, requestParam.getVideoId()));
         if (StrUtil.isNotBlank(videoJsonStr)) {
             videoDO = JSON.parseObject(videoJsonStr, VideoDO.class);
+            videoDetailLocalCache.put(videoDO.getId(), videoDO);
             return videoDO;
         }
 
@@ -667,6 +678,7 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
             videoJsonStr = (String) redisTemplate.opsForValue().get(String.format(GET_VIDEO_DETAIL_BY_VIDEOID_KEY, requestParam.getVideoId()));
             if (StrUtil.isNotBlank(videoJsonStr)) {
                 videoDO = JSON.parseObject(videoJsonStr, VideoDO.class);
+                videoDetailLocalCache.put(videoDO.getId(), videoDO);
                 return videoDO;
             }
 
