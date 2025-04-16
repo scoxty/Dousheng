@@ -267,7 +267,7 @@
 				</view>
 			</view>
 
-			<view class="tab-wrapper">
+			<view v-if="isMe" class="tab-wrapper">
 				<view style="width: 250rpx;align-self: center;" @click="switchTab(0)">
 					<text class="tab-normal" style="align-self: center;" :class="{'tab-selected': currentTab == 0}">作品</text>
 					<view v-if="currentTab == 0"
@@ -284,6 +284,18 @@
 						style="margin-top: 5px;height: 5rpx;width: 250rpx;border-radius: 6rpx;background-color: #ef274d;"></view>
 				</view>
 			</view>
+			<view v-if="!isMe" class="tab-wrapper">
+				<view style="width: 375rpx;align-self: center;" @click="switchTab(0)">
+					<text class="tab-normal" style="align-self: center;" :class="{'tab-selected': currentTab == 0}">作品</text>
+					<view v-if="currentTab == 0"
+						style="margin-top: 5px;height: 5rpx;width: 375rpx;border-radius: 6rpx;background-color: #ef274d;"></view>
+				</view>
+				<view style="width: 375rpx;align-self: center;" @click="switchTab(2)">
+					<text class="tab-normal" style="align-self: center;" :class="{'tab-selected': currentTab == 2}">赞过</text>
+					<view v-if="currentTab == 2"
+						style="margin-top: 5px;height: 5rpx;width: 375rpx;border-radius: 6rpx;background-color: #ef274d;"></view>
+				</view>
+			</view>
 			
 				
 			<view class="vlog-list">
@@ -291,7 +303,7 @@
 					<image class="vlog-cover" 
 						style="align-self: center;" 
 						:src="vlog.cover" 
-						@click="goToVlog(vlog.vlogId)"
+						@click="goToVlog(vlog.id)"
 						mode="aspectFill"></image>
 				<!-- <image class="vlog-cover" style="align-self: center;" src="/static/vlog/cover2.png" mode="widthFix"></image>-->
 				</block>
