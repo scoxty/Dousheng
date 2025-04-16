@@ -39,6 +39,11 @@ public class HotVideoScoreUpdateConsumer implements RocketMQListener<MessageExt>
     @Override
     public void onMessage(MessageExt messageExt) {
         InteractionIndicatorMsg interactionIndicatorMsg = JSON.parseObject(messageExt.getBody(), InteractionIndicatorMsg.class);
+        log.info("[HotVideoScoreUpdateConsumer] receive message, msg={}", interactionIndicatorMsg);
+        if (interactionIndicatorMsg == null || interactionIndicatorMsg.getVideoId() == null || interactionIndicatorMsg.getUserId() == null) {
+            log.error("[HotVideoScoreUpdateConsumer] interactionIndicator is null, fast return");
+            return;
+        }
         GetVideoDetailReqDTO reqDTO = GetVideoDetailReqDTO.builder().userId(interactionIndicatorMsg.getUserId()).videoId(interactionIndicatorMsg.getVideoId()).build();
         GetVideoDetailRespDTO respDTO = videoRpcService.getVideoDetail(reqDTO);
         if (!respDTO.getCode().equals(SUCCESS_CODE)) {

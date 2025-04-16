@@ -4,6 +4,10 @@ server:
 spring:
   application:
     name: api
+  servlet:
+    multipart:
+      max-file-size: 300MB
+      max-request-size: 300MB
   data:
     redis:
       host: 127.0.0.1

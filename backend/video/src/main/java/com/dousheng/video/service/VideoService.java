@@ -7,6 +7,7 @@ public interface VideoService {
     PublishRespDTO publish(PublishReqDTO requestParam);
     ChangeVideoToPrivateRespDTO changeVideoToPrivate(ChangeVideoToPrivateReqDTO requestParam);
     ChangeVideoToPublicRespDTO changeVideoToPublic(ChangeVideoToPublicReqDTO requestParam);
+    GetBaseVideoListRespDTO getBaseVideoList(GetBaseVideoListReqDTO requestParam);
     GetPublicListRespDTO getPublicList(GetPublicListReqDTO requestParam);
     GetPrivateListRespDTO getPrivateList(GetPrivateListReqDTO requestParam);
     GetVideoDetailRespDTO getVideoDetail(GetVideoDetailReqDTO requestParam);

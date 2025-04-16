@@ -12,7 +12,6 @@ import static com.dousheng.api.common.constant.RedisKeyConstant.AUTH_COUNT_LIMIT
 
 /**
  * 基于 IP 的访问次数限制器
- * 2小时内访问 100 次，超出则限流
  */
 @Component
 @RequiredArgsConstructor
@@ -21,7 +20,7 @@ public class CountLimiterByIP {
     private final RedisTemplate redisTemplate;
 
     private static final long LIMITER_TIME = 1000 * 60 * 60; // 1 h
-    private static final int MAX_COUNT = 50;
+    private static final int MAX_COUNT = 12;
 
     public boolean isAllowed(HttpServletRequest request) {
         String ip = IPUtil.getRequestIp(request);

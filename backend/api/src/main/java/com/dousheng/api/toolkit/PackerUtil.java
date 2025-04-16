@@ -90,7 +90,7 @@ public class PackerUtil {
 
     public static com.dousheng.dto.common.VideoInfoDTO packRpcVideoInfo(PublishReqDTO requestParam) {
         Long authorId = null;
-        if (StrUtil.isNotBlank(requestParam.getId())) {
+        if (StrUtil.isNotBlank(requestParam.getVlogerId())) {
             authorId = NumberUtil.parseLong(requestParam.getVlogerId());
         }
 

@@ -81,6 +81,26 @@ public class VideoServiceHandler implements VideoRpcService {
     }
 
     @Override
+    public GetBaseVideoListRespDTO getBaseVideoList(GetBaseVideoListReqDTO requestParam) {
+        GetBaseVideoListRespDTO respDTO = new GetBaseVideoListRespDTO();
+        try {
+            respDTO = videoService.getBaseVideoList(requestParam);
+            log.info("[getBaseVideoList] success: req={}, resp={}", requestParam, respDTO);
+        } catch (AbstractException e) {
+            // 已知业务异常处理
+            respDTO.setCode(e.getErrorCode());
+            respDTO.setMessage(e.getErrorMessage());
+            log.error("[getBaseVideoList] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        } catch (Throwable e) {
+            // 未知系统异常处理
+            respDTO.setCode(BaseErrorCode.SERVICE_ERROR.code());
+            respDTO.setMessage(BaseErrorCode.SERVICE_ERROR.message());
+            log.error("[getBaseVideoList] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        }
+        return respDTO;
+    }
+
+    @Override
     public GetPublicListRespDTO getPublicList(GetPublicListReqDTO requestParam) {
         GetPublicListRespDTO respDTO = new GetPublicListRespDTO();
         try {

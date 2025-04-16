@@ -3,8 +3,6 @@ package com.dousheng.video.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.log.Log;
-import cn.hutool.log.LogFactory;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -37,6 +35,7 @@ import com.dousheng.video.common.convention.exception.ServiceException;
 import com.dousheng.video.dao.entity.VideoDO;
 import com.dousheng.video.dao.mapper.VideoMapper;
 import com.dousheng.video.service.VideoService;
+import com.dousheng.video.toolkit.OssUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import io.netty.util.internal.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
@@ -45,19 +44,17 @@ import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static com.dousheng.video.common.constant.MqConstant.HOT_VIDEO_TOPIC;
-import static com.dousheng.video.common.constant.PageConstant.COMMON_PAGE_SIZE;
-import static com.dousheng.video.common.constant.PageConstant.COMMON_START_PAGE;
 import static com.dousheng.video.common.constant.RedisCacheConstant.*;
 import static com.dousheng.video.common.constant.SuccessBaseRespConstant.SUCCESS_CODE;
 import static com.dousheng.video.common.constant.SuccessBaseRespConstant.SUCCESS_MESSAGE;
@@ -95,16 +92,85 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
             new LinkedBlockingQueue<>(200),
             new ThreadPoolExecutor.CallerRunsPolicy());
 
+//    @Override
+//    public PublishRespDTO publish(PublishReqDTO requestParam) {
+//        this.checkParam(requestParam);
+//
+//        Date now = new Date();
+//        VideoDO videoDO = VideoDO.builder()
+//                .id(IdWorker.getId())
+//                .authorId(requestParam.getUserId())
+//                .playUrl(requestParam.getVideoInfo().getPlayUrl())
+//                .coverUrl(requestParam.getVideoInfo().getCoverUrl())
+//                .title(requestParam.getVideoInfo().getTitle())
+//                .width(requestParam.getVideoInfo().getWidth())
+//                .height(requestParam.getVideoInfo().getHeight())
+//                .isPrivate(NO.type)
+//                .createTime(now)
+//                .updateTime(now)
+//                .build();
+//        baseMapper.insert(videoDO);
+//
+//        redisTemplate.opsForZSet().add(
+//                String.format(GET_PUBLIC_LIST_KEY, requestParam.getUserId()),
+//                JSON.toJSONString(videoDO),
+//                videoDO.getCreateTime().getTime()
+//        );
+//        redisTemplate.expire(
+//                String.format(GET_PUBLIC_LIST_KEY, requestParam.getUserId()),
+//                GET_PUBLIC_LIST_BASE_TTL + ThreadLocalRandom.current().nextInt(31),
+//                TimeUnit.SECONDS
+//        );
+//        addVideoToLocalCache(requestParam.getUserId(), videoDO);
+//
+//        redisTemplate.opsForValue().set(
+//                String.format(GET_VIDEO_DETAIL_BY_VIDEOID_KEY, videoDO.getId()),
+//                JSON.toJSONString(videoDO),
+//                GET_VIDEO_DETAIL_BASE_TTL + ThreadLocalRandom.current().nextInt(31),
+//                TimeUnit.SECONDS);
+//        videoDetailLocalCache.put(videoDO.getId(), videoDO);
+//
+//        redisTemplate.delete(String.format(GET_WORKCOUNT_BY_AUTHORID_KEY, requestParam.getUserId()));
+//        workCountLocalCache.invalidate(requestParam.getUserId());
+//
+//        userIdCachePenetrationBloomFilter.add(requestParam.getUserId());
+//        videoIdCachePenetrationBloomFilter.add(videoDO.getId());
+//
+//        VideoInfoDTO videoInfoDTO = BeanUtil.copyProperties(videoDO, VideoInfoDTO.class);
+//        videoInfoDTO.setLikeCounts(0);
+//        videoInfoDTO.setCommentCounts(0);
+//        rocketMQTemplate.syncSend(HOT_VIDEO_TOPIC, videoInfoDTO);
+//
+//        return PublishRespDTO.builder()
+//                .code(SUCCESS_CODE)
+//                .message(SUCCESS_MESSAGE)
+//                .build();
+//    }
+
+    /**
+     * 由于CDN流量消耗较快，因此测试阶段通过服务端上传至OSS
+     */
     @Override
     public PublishRespDTO publish(PublishReqDTO requestParam) {
         this.checkParam(requestParam);
+
+        String videoName = UUID.randomUUID() + ".mp4";
+        String videoUrl = "";
+        try {
+            videoUrl = OssUtil.uploadVideo(requestParam.getVideoInfo().getPlayUrl(), videoName);
+        } catch (Exception e) {
+            throw new ServiceException(e.getMessage());
+        }
+        String coverUrl = videoUrl + String.format("?x-oss-process=video/snapshot,t_5,f_jpg,w_%d,h_%d,ar_auto", requestParam.getVideoInfo().getWidth(), requestParam.getVideoInfo().getHeight());
+        File file = new File(requestParam.getVideoInfo().getPlayUrl());
+        file.delete();
 
         Date now = new Date();
         VideoDO videoDO = VideoDO.builder()
                 .id(IdWorker.getId())
                 .authorId(requestParam.getUserId())
-                .playUrl(requestParam.getVideoInfo().getPlayUrl())
-                .coverUrl(requestParam.getVideoInfo().getCoverUrl())
+                .playUrl(videoUrl)
+                .coverUrl(coverUrl)
                 .title(requestParam.getVideoInfo().getTitle())
                 .width(requestParam.getVideoInfo().getWidth())
                 .height(requestParam.getVideoInfo().getHeight())
@@ -192,6 +258,29 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
                 code(SUCCESS_CODE).
                 message(SUCCESS_MESSAGE).
                 build();
+    }
+
+    @Override
+    public GetBaseVideoListRespDTO getBaseVideoList(GetBaseVideoListReqDTO requestParam) {
+        this.checkParam(requestParam);
+
+        List<VideoDO> videoList = new ArrayList<>();
+        if (requestParam.getUserId() != null) {
+            LambdaQueryWrapper<VideoDO> queryWrapper = Wrappers.lambdaQuery(VideoDO.class)
+                    .eq(VideoDO::getAuthorId, requestParam.getUserId());
+            videoList = baseMapper.selectList(queryWrapper);
+        } else if (CollectionUtil.isNotEmpty(requestParam.getVideoIds())) {
+            LambdaQueryWrapper<VideoDO> queryWrapper = Wrappers.lambdaQuery(VideoDO.class)
+                    .in(VideoDO::getId, requestParam.getVideoIds());
+            videoList = baseMapper.selectList(queryWrapper);
+        }
+        List<VideoInfoDTO> videoInfoDTOList = BeanUtil.copyToList(videoList, VideoInfoDTO.class);
+
+        return GetBaseVideoListRespDTO.builder()
+                .code(SUCCESS_CODE)
+                .message(SUCCESS_MESSAGE)
+                .videoList(videoInfoDTOList)
+                .build();
     }
 
     @Override
@@ -378,6 +467,9 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
 
             GetVideoDetailRespDTO getVideoDetailRespDTO = this.getVideoDetail(getVideoDetailReqDTO);
 
+            if (getVideoDetailRespDTO.getVideoInfo().getIsPrivate().equals(YES.type)) {
+                continue;
+            }
             videoInfoDTOList.add(getVideoDetailRespDTO.getVideoInfo());
         }
 
@@ -551,6 +643,15 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
         }
     }
 
+    public void checkParam(GetBaseVideoListReqDTO requestParam) {
+        if (requestParam == null) {
+            throw new ClientException(REQUEST_PARAM_NULL);
+        }
+        if (requestParam.getUserId() == null && CollectionUtil.isEmpty(requestParam.getVideoIds())) {
+            throw new ClientException(REQUEST_PARAM_NULL);
+        }
+    }
+
     public void addVideoToLocalCache(Long userId, VideoDO newVideo) {
         List<VideoDO> currentList = publicListLocalCache.getIfPresent(userId);
         if (currentList == null) {
@@ -598,6 +699,9 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
                     .eq(VideoDO::getIsPrivate, requestParam.getIsPrivate())
                     .orderByDesc(VideoDO::getCreateTime);
             videoDOList = baseMapper.selectPage(pageReq, queryWrapper).getRecords();
+            if (CollectionUtil.isEmpty(videoDOList)) {
+                return Collections.emptyList();
+            }
 
             // page从小到大逐渐增加
             // 缓存命中最高的是前几页，深分页大多不会命中
