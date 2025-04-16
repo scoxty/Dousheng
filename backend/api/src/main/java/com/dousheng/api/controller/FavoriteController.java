@@ -3,6 +3,7 @@ package com.dousheng.api.controller;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
+import com.dousheng.api.common.biz.user.UserContext;
 import com.dousheng.api.common.convention.result.PagedGridResult;
 import com.dousheng.api.common.convention.result.Result;
 import com.dousheng.api.common.convention.result.Results;
@@ -10,9 +11,11 @@ import com.dousheng.api.toolkit.PackerUtil;
 import com.dousheng.dto.req.favorite.FavoriteActionReqDTO;
 import com.dousheng.dto.req.favorite.GetFavoriteListReqDTO;
 import com.dousheng.dto.req.favorite.GetVideoLikeCountsReqDTO;
+import com.dousheng.dto.req.favorite.IsLikeVideoReqDTO;
 import com.dousheng.dto.resp.favorite.FavoriteActionRespDTO;
 import com.dousheng.dto.resp.favorite.GetFavoriteListRespDTO;
 import com.dousheng.dto.resp.favorite.GetVideoLikeCountsRespDTO;
+import com.dousheng.dto.resp.favorite.IsLikeVideoRespDTO;
 import com.dousheng.service.FavoriteRpcService;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -84,7 +87,7 @@ public class FavoriteController {
                     page(respDTO.getPage()).
                     total(respDTO.getTotalPage()).
                     records(respDTO.getTotalCount()).
-                    rows(PackerUtil.packApiIndexFeed(respDTO.getVideoList())).
+                    rows(PackerUtil.packApiPublishList(respDTO.getVideoList())). // 兼容前端...
                     build();
             log.info("[getMyLikedList] error: req={}, resp={}", reqDTO, respDTO);
             return Results.success(pagedGridResult);
@@ -110,6 +113,24 @@ public class FavoriteController {
         result.setCode(respDTO.getCode());
         result.setMessage(respDTO.getMessage());
         log.error("[getVideoLikedCounts] error: req={}, resp={}", reqDTO, result);
+        return result;
+    }
+
+    @GetMapping("/vlog/queryDoILikeVideo")
+    public Result<Boolean> isLiked(@RequestParam String vlogId) {
+        IsLikeVideoReqDTO reqDTO = IsLikeVideoReqDTO.builder().
+                userId(UserContext.getUserId()).
+                videoId(NumberUtil.parseLong(vlogId)).
+                build();
+        IsLikeVideoRespDTO respDTO = favoriteRpcService.isLikeVideo(reqDTO);
+        if (respDTO.getCode().equals(SUCCESS_CODE)) {
+            log.info("[isLiked] success: req={}, resp={}", reqDTO, respDTO);
+            return Results.success(respDTO.getIsLike());
+        }
+        Result<Boolean> result = new Result<>();
+        result.setCode(respDTO.getCode());
+        result.setMessage(respDTO.getMessage());
+        log.error("[isLiked] error: req={}, resp={}", reqDTO, result);
         return result;
     }
 }

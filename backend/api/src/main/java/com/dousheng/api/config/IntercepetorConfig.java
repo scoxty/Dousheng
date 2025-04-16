@@ -75,6 +75,7 @@ public class IntercepetorConfig implements WebMvcConfigurer {
                 "/vlog/friendList",
                 "/vlog/like",
                 "/vlog/unlike",
+                "/vlog/queryDoILikeVideo",
                 "/comment/like",
                 "/comment/unlike",
                 "/comment/create",
