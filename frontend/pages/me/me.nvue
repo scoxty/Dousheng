@@ -343,7 +343,6 @@
 				var month = birthArr[1];
 				var day = birthArr[2];
 			
-				app.testAstro(month, day);
 				var astro = app.getAstro(month, day);
 				this.astro = astro;
 				

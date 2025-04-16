@@ -43,7 +43,11 @@
 			var height = parseInt(params.height);
 			this.width = width;
 			this.height = height;
-
+			
+			console.log("videoUrl: " + this.videoUrl);
+			console.log("width: " + this.width);
+			console.log("height: " + this.height);
+			
 			if (width >= height) {
 				me.objectFit = "contain";
 			} else {

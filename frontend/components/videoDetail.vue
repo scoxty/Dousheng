@@ -291,30 +291,48 @@
 			
 			// 喜欢/点赞的list重新设置
 			reLikePlayList(vlogId) {
-				var me = this;
-				var playerList = me.playerList;
-				// 关注以后，循环当前playerList，修改对应粉丝关系的doIFollowVloger改为true
-				for (var i = 0 ; i < playerList.length ; i ++) {
-					var vlog = playerList[i];
-					if (vlog.vlogId == vlogId) {
-						vlog.doILikeThisVlog = true;
-						playerList.splice(i,1, vlog);
-					}
+				// var me = this;
+				// var playerList = me.playerList;
+				// // 关注以后，循环当前playerList，修改对应粉丝关系的doIFollowVloger改为true
+				// for (var i = 0 ; i < playerList.length ; i ++) {
+				// 	var vlog = playerList[i];
+				// 	if (vlog.vlogId == vlogId) {
+				// 		vlog.doILikeThisVlog = true;
+				// 		playerList.splice(i,1, vlog);
+				// 	}
+				// }
+				// me.playerList = playerList;
+				const index = this.playerList.findIndex(v => v.vlogId === vlogId);
+				if (index !== -1) {
+					const vlog = this.playerList[index];
+					vlog.doILikeThisVlog = true;
+					vlog.likeCounts = (vlog.likeCounts || 0) + 1;
+					this.$set(this.playerList, index, {
+						...vlog
+					}); // 触发响应式更新
 				}
-				me.playerList = playerList;
 			},
 			reDislikePlayList(vlogId) {
-				var me = this;
-				var playerList = me.playerList;
-				// 关注以后，循环当前playerList，修改对应粉丝关系的doIFollowVloger改为true
-				for (var i = 0 ; i < playerList.length ; i ++) {
-					var vlog = playerList[i];
-					if (vlog.vlogId == vlogId) {
-						vlog.doILikeThisVlog = false;
-						playerList.splice(i,1, vlog);
-					}
+				// var me = this;
+				// var playerList = me.playerList;
+				// // 关注以后，循环当前playerList，修改对应粉丝关系的doIFollowVloger改为true
+				// for (var i = 0 ; i < playerList.length ; i ++) {
+				// 	var vlog = playerList[i];
+				// 	if (vlog.vlogId == vlogId) {
+				// 		vlog.doILikeThisVlog = false;
+				// 		playerList.splice(i,1, vlog);
+				// 	}
+				// }
+				// me.playerList = playerList;
+				const index = this.playerList.findIndex(v => v.vlogId === vlogId);
+				if (index !== -1) {
+					const vlog = this.playerList[index];
+					vlog.doILikeThisVlog = false;
+					vlog.likeCounts = Math.max(0, (vlog.likeCounts || 1) - 1);
+					this.$set(this.playerList, index, {
+						...vlog
+					}); // 保证响应
 				}
-				me.playerList = playerList;
 			},
 			
 			reChangeVlogLikedCountsInPlayList(vlogId, counts) {
@@ -338,7 +356,7 @@
 				var currentIndex = me.playerCur;
 				var vlog = me.playerList[currentIndex];
 				uni.request({
-					method: "POST",
+					method: "GET",
 					url: serverUrl + "/vlog/totalLikedCounts?vlogId=" + vlog.vlogId,
 					success(result) {
 						if (result.data.code == "0") {
@@ -385,7 +403,7 @@
 							
 							if (result.data.code == "0") {
 								me.reLikePlayList(vlog.vlogId);
-								me.refreshVlogCounts();
+								// me.refreshVlogCounts();
 							} else {
 								uni.showToast({
 									title: result.data.message,
@@ -431,7 +449,7 @@
 							
 							if (result.data.code == "0") {
 								me.reDislikePlayList(vlog.vlogId);
-								me.refreshVlogCounts();
+								// me.refreshVlogCounts();
 							} else {
 								uni.showToast({
 									title: result.data.message,

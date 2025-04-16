@@ -732,7 +732,7 @@
 				var currentIndex = me.playerCur;
 				var vlog = me.playerList[currentIndex];
 				uni.request({
-					method: "POST",
+					method: "GET",
 					url: serverUrl + "/vlog/totalLikedCounts?vlogId=" + vlog.vlogId,
 					success(result) {
 						if (result.data.code == "0") {

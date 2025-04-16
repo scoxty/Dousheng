@@ -16,7 +16,6 @@
 			
 			console.log("Dousheng app启动...");
 			
-			
 			var me = this;
 			uni.onTabBarMidButtonTap(()=>{
 				
@@ -194,10 +193,6 @@
 			// 获得星座
 			getAstro(m, d){
 				return "魔羯水瓶双鱼牡羊金牛双子巨蟹狮子处女天秤天蝎射手魔羯".substr(m*2-(d<"102223444433".charAt(m-1)- -19)*2,2);
-			},
-			//下面写一个测试函数
-			testAstro(month, day){
-				console.log(month + "月" + day + "日: " + this.getAstro(month, day));
 			},
 			// 获得生肖
 			getAnimal(year){

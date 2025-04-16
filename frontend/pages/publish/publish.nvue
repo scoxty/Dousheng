@@ -1,136 +1,140 @@
 <style>
-.page {
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: 0;
-	background-color: #000000;
-}
-	
-.header {
-	position: absolute;
-	left: 0;
-	right: 0;
-	flex-direction: row;
-	height: 100rpx;
-	line-height: 100rpx;
-	align-items: center;
-	padding-left: 40rpx;
-	padding-right: 40rpx;
-}
+	.page {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		background-color: #000000;
+	}
 
-.header-center {
-	flex: 1;
-	flex-direction: row;
-	align-items: center;
-	justify-content: center;
-}
+	.header {
+		position: absolute;
+		left: 0;
+		right: 0;
+		flex-direction: row;
+		height: 100rpx;
+		line-height: 100rpx;
+		align-items: center;
+		padding-left: 40rpx;
+		padding-right: 40rpx;
+	}
 
-.header-left,
-.header-right {
-	color: #999;
-	height: 100rpx;
-	line-height: 100rpx;
-	align-items: flex-start;
-	justify-content: flex-end;
-	font-family: iconfont;
-}
+	.header-center {
+		flex: 1;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+	}
 
-.header-right-search {
-	height: 100rpx;
-	/* align-items: flex-start;
+	.header-left,
+	.header-right {
+		color: #999;
+		height: 100rpx;
+		line-height: 100rpx;
+		align-items: flex-start;
+		justify-content: flex-end;
+		font-family: iconfont;
+	}
+
+	.header-right-search {
+		height: 100rpx;
+		/* align-items: flex-start;
 	justify-content: flex-end; */
-}
+	}
 
-.header-item {
-	align-items: center;
-	margin-left: 6rpx;
-	margin-right: 6rpx;
-}
+	.header-item {
+		align-items: center;
+		margin-left: 6rpx;
+		margin-right: 6rpx;
+	}
 
-.header-item-title {
-	width: 200rpx;
-	text-align: center;
-	height: 60rpx;
-	line-height: 60rpx;
-	color: #FFFFFF;
-	font-size: 18px;
-	font-weight: 400;
-}
-.header-refresh-title {
-	width: 300rpx;
-	text-align: center;
-	height: 60rpx;
-	line-height: 60rpx;
-	color: #FFFFFF;
-	font-size: 16px;
-	font-weight: 600;
-}
-.header-item-line {
-	height: 5rpx;
-	line-height: 8rpx;
-	width: 60rpx;
-	border-radius: 8rpx;
-}
+	.header-item-title {
+		width: 200rpx;
+		text-align: center;
+		height: 60rpx;
+		line-height: 60rpx;
+		color: #FFFFFF;
+		font-size: 18px;
+		font-weight: 400;
+	}
 
-.preplay-wrapper {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	margin-top: -90rpx;
-	margin-left: 30rpx;
-	border-width: 1px;
-	/* border-color: #343438; */
-	/* background-color: #0c0c0c; */
-	padding: 6rpx 16rpx;
-	width: 200rpx;
-	border-radius: 20rpx;
-}
+	.header-refresh-title {
+		width: 300rpx;
+		text-align: center;
+		height: 60rpx;
+		line-height: 60rpx;
+		color: #FFFFFF;
+		font-size: 16px;
+		font-weight: 600;
+	}
 
-.vlog-content {
-	margin-top: 30rpx;
-	height: 100px;
-	color: #FFFFFF;
-	font-size: 16px;
-	background-color: #0c0c0c;
-	padding-left: 10px;
-	padding-top: 10px;
-	padding-right: 10px;
-	padding-bottom: 10px;
-	border-radius: 10px;
-}
+	.header-item-line {
+		height: 5rpx;
+		line-height: 8rpx;
+		width: 60rpx;
+		border-radius: 8rpx;
+	}
 
-.btn-preplay {
-	background-color: #0c0c0c;
-	border-color: #343438;
-}
-.btn-preplay-touched {
-	background-color: #545456;
-	border-color: #000000;
-}
+	.preplay-wrapper {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		margin-top: -90rpx;
+		margin-left: 30rpx;
+		border-width: 1px;
+		/* border-color: #343438; */
+		/* background-color: #0c0c0c; */
+		padding: 6rpx 16rpx;
+		width: 200rpx;
+		border-radius: 20rpx;
+	}
 
-.btn-publish {
-	background-color: #ef274d;
-}
-.btn-publish-touched {
-	background-color: #de6981;
-}
+	.vlog-content {
+		margin-top: 30rpx;
+		height: 100px;
+		color: #FFFFFF;
+		font-size: 16px;
+		background-color: #0c0c0c;
+		padding-left: 10px;
+		padding-top: 10px;
+		padding-right: 10px;
+		padding-bottom: 10px;
+		border-radius: 10px;
+	}
 
-.choose-cover {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	width: 360rpx;
-	background-color: #000000;
-	opacity: 0.3;
-	height: 50px;
-	margin-left: 30rpx;
-	border-bottom-right-radius: 10px;
-	border-bottom-left-radius: 10px;
-	position: relative;
-	top: -50px;
-}
+	.btn-preplay {
+		background-color: #0c0c0c;
+		border-color: #343438;
+	}
+
+	.btn-preplay-touched {
+		background-color: #545456;
+		border-color: #000000;
+	}
+
+	.btn-publish {
+		background-color: #ef274d;
+	}
+
+	.btn-publish-touched {
+		background-color: #de6981;
+	}
+
+	.choose-cover {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		width: 360rpx;
+		background-color: #000000;
+		opacity: 0.3;
+		height: 50px;
+		margin-left: 30rpx;
+		border-bottom-right-radius: 10px;
+		border-bottom-left-radius: 10px;
+		position: relative;
+		top: -50px;
+	}
 </style>
 
 <template>
@@ -150,67 +154,55 @@
 					src="../../static/images/icon-search.png"  
 					style="width: 50rpx;height: 50rpx;opacity: 0.8;">
 		</view> -->
-		
+
 		<!-- 进度条 -->
-		<view 
-			style="marginTop:60rpx;display: flex;flex-direction: column;justify-content: center;" 
+		<view style="marginTop:60rpx;display: flex;flex-direction: column;justify-content: center;"
 			v-if="percentCompleted != 100">
-			<progress 
-				:percent="percentCompleted" 
-				stroke-width="3" 
-				activeColor="#ef274d"
-				backgroundColor="#F1F1F1"
-				:style="{screenWidth: screenWidth + 'px'}"
-				/>
-			<text 
-				style="color: #F1F1F1;font-size: 16px;text-align: center;margin-top: 20px;" 
+			<progress :percent="percentCompleted" stroke-width="3" activeColor="#ef274d" backgroundColor="#F1F1F1"
+				:style="{screenWidth: screenWidth + 'px'}" />
+			<text style="color: #F1F1F1;font-size: 16px;text-align: center;margin-top: 20px;"
 				:style="{screenWidth: screenWidth + 'px'}">视频上传中~ 请耐心等待~~</text>
-			<image mode="aspectFit"
-				src="../../static/images/loading-4.gif"  
+			<image mode="aspectFit" src="../../static/images/loading-4.gif"
 				style="width: 600rpx;height: 600rpx;align-self: center;">
 		</view>
-		
-		
+
+
 		<!-- 发布主体内容 -->
 		<view v-if="percentCompleted == 100">
-			<image :src="tempCover" mode="aspectFit"
-				style="marginTop: 30px;width: 360rpx;height: 500rpx;border-radius: 10px;margin-left: 30rpx;margin-top: 10px;"></image>
-			
-			<view class="choose-cover" @click="chooseCover">
+			<video :src="tempFilePath"
+				style="margin-top: 30rpx; width: 360rpx; height: 500rpx; border-radius: 10px; margin-left: 30rpx;"
+				object-fit="cover" autoplay="false" controls="true" show-center-play-btn="true"
+				enable-progress-gesture="true" />
+			<!-- 			<image :src="tempCover" mode="aspectFit"
+				style="marginTop: 30px;width: 360rpx;height: 500rpx;border-radius: 10px;margin-left: 30rpx;margin-top: 10px;">
+			</image> -->
+
+			<!-- 			<view class="choose-cover" @click="chooseCover">
 				<text style="color: #ffffff;font-size: 14px;align-self: center;">选择封面</text>
-			</view>
-			
-			<view class="preplay-wrapper" 
-				:class="{'btn-preplay':!preplayTouched, 'btn-preplay-touched': preplayTouched}"
-				@click="preview"
-				@touchstart="touchstartPreplay" 
-				@touchend="touchendPreplay">
-				<image src="../../static/images/btn-play.png" 
-					style="width: 22rpx;height: 22rpx;align-self: center;"></image>
+			</view> -->
+
+			<!-- 			<view class="preplay-wrapper"
+				:class="{'btn-preplay':!preplayTouched, 'btn-preplay-touched': preplayTouched}" @click="preview"
+				@touchstart="touchstartPreplay" @touchend="touchendPreplay">
+				<image src="../../static/images/btn-play.png" style="width: 22rpx;height: 22rpx;align-self: center;">
+				</image>
 				<text style="color: #e6e6e6;font-size: 14px;align-self: center;margin-left: 10rpx;">预览视频</text>
-			</view>
-			
+			</view> -->
+
 			<!-- :style="{screenWidth: screenWidth - 150 + 'px'}" -->
-			<textarea 
-				class="vlog-content" 
-				placeholder-style="color: #9798a0;" 
-				placeholder="添加合适的标题内容" 
-				:value="title"
-				:model="title" 
-				maxlength="60"
-				@input="typingContent"
-				confirm-type="done"></textarea>
-			
+			<textarea class="vlog-content" placeholder-style="color: #9798a0;" placeholder="添加合适的标题内容" :value="title"
+				:model="title" maxlength="60" @input="typingContent" confirm-type="done"></textarea>
+
 			<!-- <view :style="{screenWidth: screenWidth + 'px'}" style="height: 1rpx;background-color: #383a44;margin-top: 20rpx;"></view> -->
-			
-			<view :class="{'btn-publish':!publichTouched, 'btn-publish-touched': publichTouched}" 
+
+			<view :class="{'btn-publish':!publichTouched, 'btn-publish-touched': publichTouched}"
 				style="margin-top: 30rpx;height: 90rpx;display: flex;justify-content: center;border-radius: 20px;"
-				@touchstart="touchstartPublich" @touchend="touchendPublich" @click="doPublich">
+				@touchstart="touchstartPublich" @touchend="touchendPublich" @click="doPublish">
 				<text style="color: #e6e6e6;font-size: 18px;align-self: center;font-weight: 500;">发布 Vlog</text>
 			</view>
 		</view>
-		
-		
+
+
 	</view>
 </template>
 
@@ -229,7 +221,7 @@
 				title: "",
 				width: 0,
 				height: 0,
-				
+
 				percentCompleted: 0
 			}
 		},
@@ -237,122 +229,207 @@
 			var me = this;
 			this.statusBarHeight = system.statusBarHeight;
 			this.screenWidth = system.screenWidth;
-			
+
 			// 上个页面传过来的文件事件对象，其中包含了相册中选择的视频内容
 			var fileObjectEvent = JSON.parse(params.fileObjectEvent);
 			var times = new Date().getTime();
-			uniCloud.uploadFile({
-				filePath: fileObjectEvent.tempFilePath,
-				cloudPath: times + '.mp4',
-				onUploadProgress(progressEvent) {
-					var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-					me.percentCompleted = percentCompleted;
-				},
-				success(f) {
-					var videoUrlTemp = f.filePath;
-					var videoUrl = f.fileID;
+			// uniCloud.uploadFile({
+			// 	filePath: fileObjectEvent.tempFilePath,
+			// 	cloudPath: times + '.mp4',
+			// 	onUploadProgress(progressEvent) {
+			// 		var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+			// 		me.percentCompleted = percentCompleted;
+			// 	},
+			// 	success(f) {
+			// 		var videoUrlTemp = f.filePath;
+			// 		var videoUrl = f.fileID;
 
-					// 获得视频参数
-					me.tempFilePath = videoUrlTemp;
-					me.videoUrl = videoUrl;
-					me.tempCover = videoUrl + "?x-oss-process=video/snapshot,t_1,f_jpg,ar_auto";	// 截帧
-					me.width = fileObjectEvent.width;
-					me.height = fileObjectEvent.height;
-				}
-			});
+			// 		// 获得视频参数
+			// 		me.tempFilePath = videoUrlTemp;
+			// 		me.videoUrl = videoUrl;
+			// 		me.tempCover = videoUrl + "?x-oss-process=video/snapshot,t_1,f_jpg,ar_auto";	// 截帧
+			// 		me.width = fileObjectEvent.width;
+			// 		me.height = fileObjectEvent.height;
+			// 	}
+			// });
+
+			// CDN流量容易超标，测试阶段直接上传到服务端
+			me.percentCompleted = 100;
+			me.tempFilePath = fileObjectEvent.tempFilePath;
+			me.width = fileObjectEvent.width;
+			me.height = fileObjectEvent.height;
 		},
 		methods: {
 			typingContent(e) {
 				var event = e;
 				this.title = e.detail.value;
 			},
-			doPublich() {
+			doPublish() {
 				var me = this;
 				var userId = getApp().getUserInfoSession().id;
-				
-				var vlog ={
-					"vlogerId": userId,
-					"url": me.videoUrl,
-					"cover": me.tempCover,
-					"title": me.title,
-					"width": me.width,
-					"height": me.height
-				};
-				
-				// 发布视频
 				var serverUrl = app.globalData.serverUrl;
-				uni.request({
-					method: "POST",
+
+				console.log("点击上传")
+
+				uni.showLoading({
+					title: '上传中...',
+					mask: true // 遮罩防止点击
+				});
+
+				console.log("点击上传2")
+
+				uni.uploadFile({
 					header: {
 						headerUserId: userId,
 						headerUserToken: app.getUserSessionToken()
 					},
 					url: serverUrl + "/vlog/publish",
-					data: vlog,
+					name: "file",
+					filePath: me.tempFilePath,
+					formData: {
+						title: me.title,
+						vlogerId: userId,
+						width: me.width,
+						height: me.height
+					},
 					success(result) {
-						
-						if (result.data.code == "0") {
-							uni.showToast({
-								title: "发布成功！",
-								icon: "none"
-							})
-							
-							uni.navigateBack({
-								delta: 1,
-								animationType: 'zoom-fade-in',
-								animationDuration: 1000
-							});
-							
-							uni.switchTab({
-								url: "../me/me"
-							})
+
+						if (result.statusCode == 200) {
+							var res = JSON.parse(result.data);
+
+							if (res.code == "0") {
+								uni.hideLoading();
+
+
+								uni.showToast({
+									title: "发布成功！",
+									icon: "none"
+								});
+
+								uni.navigateBack({
+									delta: 1,
+									animationType: 'zoom-fade-in',
+									animationDuration: 1000
+								});
+
+								uni.switchTab({
+									url: "../me/me"
+								});
+								// uni.navigateBack({
+								// 	delta: 1,
+								// 	animationType: "fade-out"
+								// });
+							} else {
+								uni.showToast({
+									title: res.message,
+									icon: 'error'
+								})
+							}
 						} else {
 							uni.showToast({
-								title: result.data.message,
-								icon: "none",
-								duration: 3000
-							});
+								title: "上传失败",
+								icon: 'error'
+							})
 						}
-						
+
 					}
 				});
-				
 			},
-			
+			// doPublish() {
+			// 	var me = this;
+			// 	var userId = getApp().getUserInfoSession().id;
+
+			// 	var vlog ={
+			// 		"vlogerId": userId,
+			// 		"url": me.videoUrl,
+			// 		"cover": me.tempCover,
+			// 		"title": me.title,
+			// 		"width": me.width,
+			// 		"height": me.height
+			// 	};
+
+			// 	// 发布视频
+			// 	var serverUrl = app.globalData.serverUrl;
+			// 	uni.request({
+			// 		method: "POST",
+			// 		header: {
+			// 			headerUserId: userId,
+			// 			headerUserToken: app.getUserSessionToken()
+			// 		},
+			// 		url: serverUrl + "/vlog/publish",
+			// 		data: vlog,
+			// 		success(result) {
+
+			// 			if (result.data.code == "0") {
+			// 				uni.showToast({
+			// 					title: "发布成功！",
+			// 					icon: "none"
+			// 				})
+
+			// 				uni.navigateBack({
+			// 					delta: 1,
+			// 					animationType: 'zoom-fade-in',
+			// 					animationDuration: 1000
+			// 				});
+
+			// 				uni.switchTab({
+			// 					url: "../me/me"
+			// 				})
+			// 			} else {
+			// 				uni.showToast({
+			// 					title: result.data.message,
+			// 					icon: "none",
+			// 					duration: 3000
+			// 				});
+			// 			}
+
+			// 		}
+			// 	});
+
+			// },
+
+			// preview() {
+			// 	uni.navigateTo({
+			// 		url: "/pages/publish/preview?videoUrl=" + this.videoUrl + "&width=" + this.width + "&height=" + this.height,
+			// 		animationType: 'slide-in-bottom',
+			// 		animationDuration: 500
+			// 	})
+			// },
 			preview() {
 				uni.navigateTo({
-					url: "/pages/publish/preview?videoUrl=" + this.videoUrl + "&width=" + this.width + "&height=" + this.height,
+					url: `/pages/publish/preview?videoUrl=${this.tempFilePath}&width=${this.width}&height=${this.height}`,
 					animationType: 'slide-in-bottom',
 					animationDuration: 500
 				})
 			},
-			
+
+
 			touchstartPreplay() {
 				this.preplayTouched = true;
 			},
-			
+
 			touchendPreplay() {
 				this.preplayTouched = false;
 			},
-			
+
 			touchstartPublich() {
 				this.publichTouched = true;
 			},
-			
+
 			touchendPublich() {
 				this.publichTouched = false;
 			},
-			
+
 			chooseCover() {
 				var me = this;
 				var userId = getApp().getUserInfoSession().id;
-				
+
 				uni.chooseImage({
 					count: 1,
 					sourceType: ['album'],
 					success(e) {
 						me.tempCover = e.tempFilePaths[0];
-						
+
 						// 上传封面
 						var serverUrl = app.globalData.serverUrl;
 						uni.uploadFile({
@@ -376,7 +453,7 @@
 					}
 				})
 			}
-			
+
 		}
 	}
 </script>
