@@ -692,6 +692,7 @@
 					this.playerCur = index;
 				}
 
+				this.refreshVlogIsLiked();
 				this.refreshVlogCounts();
 				this.setThisVlogInfo();
 				this.freshCommentCounts();
@@ -706,6 +707,51 @@
 				this.thisVlog = vlog;
 				this.thisVlogId = vlog.vlogId;
 				this.thisVlogerId = vlog.vlogerId;
+			},
+			
+			refreshVlogIsLiked() {
+				console.log("触发查询点赞状态");
+				var me = this;
+				var serverUrl = app.globalData.serverUrl;
+				var currentIndex = me.playerCur;
+				var vlog = me.playerList[currentIndex];
+				var myUserInfo = getApp().getUserInfoSession();
+				if (myUserInfo == null || myUserInfo == "undefined") { 
+					me.reChangeVlogLikedCountsInPlayList(vlog.vlogId, false);
+					console.log("未登录，直接设置未false");
+					return;
+				}
+				var userId = myUserInfo.id;
+				uni.request({
+					method: "GET",
+					header: {
+						headerUserId: userId,
+						headerUserToken: app.getUserSessionToken()
+					},
+					url: serverUrl + "/vlog/queryDoILikeVideo?vlogId=" + vlog.vlogId,
+					success(result) {
+						if (result.data.code == "0") {
+							var doILikeThisVlog = result.data.data;
+							me.reChangeVlogIsLikedInPlayList(vlog.vlogId, doILikeThisVlog);
+						}
+					}
+				});
+				console.log("查询并设置点赞状态");
+			},
+			
+			reChangeVlogIsLikedInPlayList(vlogId, doILikeThisVlog) {
+				var me = this;
+				var playerList = me.playerList;
+			
+				// 关注以后，循环当前playerList，修改对应粉丝关系的doIFollowVloger改为true
+				for (var i = 0; i < playerList.length; i++) {
+					var vlog = playerList[i];
+					if (vlog.vlogId == vlogId) {
+						vlog.doILikeThisVlog = doILikeThisVlog;
+						playerList.splice(i, 1, vlog);
+					}
+				}
+				me.playerList = playerList;
 			},
 
 			refreshVlogCounts() {
