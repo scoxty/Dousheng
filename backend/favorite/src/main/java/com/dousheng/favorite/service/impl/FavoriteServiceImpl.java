@@ -21,6 +21,7 @@ import com.dousheng.favorite.dao.entity.FavoriteDO;
 import com.dousheng.favorite.dao.mapper.FavoriteMapper;
 import com.dousheng.favorite.mq.message.FavoriteActionMsg;
 import com.dousheng.favorite.mq.message.InteractionIndicatorMsg;
+import com.dousheng.favorite.mq.message.OperateDBMsg;
 import com.dousheng.favorite.service.FavoriteService;
 import com.dousheng.service.VideoRpcService;
 import io.netty.util.internal.ThreadLocalRandom;
@@ -44,8 +45,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.dousheng.favorite.common.constant.MqConstant.FAVORITE_ACTION_TOPIC;
-import static com.dousheng.favorite.common.constant.MqConstant.INTERACTION_INDICATOR_TOPIC;
+import static com.dousheng.favorite.common.constant.MqConstant.*;
 import static com.dousheng.favorite.common.constant.RedisCacheConstant.*;
 import static com.dousheng.favorite.common.constant.SuccessBaseRespConstant.SUCCESS_CODE;
 import static com.dousheng.favorite.common.constant.SuccessBaseRespConstant.SUCCESS_MESSAGE;
@@ -262,9 +262,6 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, FavoriteDO>
             return;
         }
 
-        List<FavoriteDO> addActionList = new ArrayList<>();
-        List<FavoriteActionMsg> removeActionList = new ArrayList<>();
-
         for (FavoriteActionMsg msg : msgList) {
             IsLikeVideoRespDTO isLikeVideoRespDTO = this.isLikeVideo(
                     IsLikeVideoReqDTO.builder().
@@ -278,19 +275,19 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, FavoriteDO>
                 continue;
             }
 
-            if (!isLike) {
-                FavoriteDO favoriteDO = FavoriteDO.builder().
-                        id(IdWorker.getId()).
-                        userId(msg.getUserId()).
-                        videoId(msg.getVideoId()).
-                        build();
-                addActionList.add(favoriteDO);
-            } else {
-                removeActionList.add(msg);
-            }
-
             this.addFavoriteActionToRedis(msg.getUserId(), msg.getAuthorId(), msg.getVideoId(), msg.getActionType());
 
+            // 通过mq重试保证写入db成功
+            rocketMQTemplate.syncSendOrderly(
+                    FAVORITE_OPERATE_DB_TOPIC,
+                    OperateDBMsg.builder()
+                            .userId(msg.getUserId())
+                            .videoId(msg.getVideoId())
+                            .actionType(msg.getActionType())
+                            .build(),
+                    msg.getUserId() + ":" + msg.getVideoId()
+            );
+            // 点赞指标上报
             rocketMQTemplate.syncSend(
                     INTERACTION_INDICATOR_TOPIC,
                     InteractionIndicatorMsg.builder().
@@ -299,23 +296,6 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, FavoriteDO>
                             userId(msg.getUserId()).
                             videoId(msg.getVideoId()).
                             build());
-        }
-
-        // 批量新增
-        if (CollectionUtil.isNotEmpty(addActionList)) {
-            baseMapper.insertBatchSomeColumn(addActionList);
-        }
-        // 批量删除
-        if (CollectionUtil.isNotEmpty(removeActionList)) {
-            LambdaQueryWrapper<FavoriteDO> removeWrapper = Wrappers.lambdaQuery();
-            removeWrapper.and(w -> {
-                for (FavoriteActionMsg msg : removeActionList) {
-                    w.or()
-                            .eq(FavoriteDO::getUserId, msg.getUserId())
-                            .eq(FavoriteDO::getVideoId, msg.getVideoId());
-                }
-            });
-            this.remove(removeWrapper);
         }
     }
 

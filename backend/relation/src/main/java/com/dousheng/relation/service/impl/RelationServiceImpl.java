@@ -2,7 +2,6 @@ package com.dousheng.relation.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.system.UserInfo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -13,14 +12,13 @@ import com.dousheng.dto.req.user.IsExistReqDTO;
 import com.dousheng.dto.resp.relation.*;
 import com.dousheng.dto.resp.user.GetBaseUserInfoListRespDTO;
 import com.dousheng.dto.resp.user.IsExistRespDTO;
-import com.dousheng.relation.common.convention.exception.AbstractException;
 import com.dousheng.relation.common.convention.exception.ClientException;
 import com.dousheng.relation.common.convention.exception.RemoteException;
 import com.dousheng.relation.common.convention.exception.ServiceException;
 import com.dousheng.relation.common.enums.RelationActionTypeEnum;
 import com.dousheng.relation.dao.entity.RelationDO;
 import com.dousheng.relation.dao.mapper.RelationMapper;
-import com.dousheng.relation.mq.message.RelationActionMsg;
+import com.dousheng.relation.mq.message.OperateDBMsg;
 import com.dousheng.relation.service.RelationService;
 import com.dousheng.service.UserRpcService;
 import io.netty.util.internal.ThreadLocalRandom;
@@ -36,7 +34,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -44,9 +41,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
-import static com.dousheng.relation.common.constant.MqConstant.RELATION_ACTION_TOPIC;
+import static com.dousheng.relation.common.constant.MqConstant.RELATION_OPERATE_DB_TOPIC;
 import static com.dousheng.relation.common.constant.RedisCacheConstant.*;
 import static com.dousheng.relation.common.constant.SuccessBaseRespConstant.SUCCESS_CODE;
 import static com.dousheng.relation.common.constant.SuccessBaseRespConstant.SUCCESS_MESSAGE;
@@ -115,8 +111,8 @@ public class RelationServiceImpl extends ServiceImpl<RelationMapper, RelationDO>
                 // 通过MQ重试保证写入MySQL成功
                 executorService.execute(()->{
                     rocketMQTemplate.syncSendOrderly(
-                            RELATION_ACTION_TOPIC,
-                            RelationActionMsg.builder().
+                            RELATION_OPERATE_DB_TOPIC,
+                            OperateDBMsg.builder().
                                     fromUserId(requestParam.getFromUserId()).
                                     toUserId(requestParam.getToUserId()).
                                     actionType(requestParam.getActionType()).
@@ -154,8 +150,8 @@ public class RelationServiceImpl extends ServiceImpl<RelationMapper, RelationDO>
                 // 通过MQ重试保证MySQL删除成功
                 executorService.execute(()->{
                     rocketMQTemplate.syncSendOrderly(
-                            RELATION_ACTION_TOPIC,
-                            RelationActionMsg.builder().
+                            RELATION_OPERATE_DB_TOPIC,
+                            OperateDBMsg.builder().
                                     fromUserId(requestParam.getFromUserId()).
                                     toUserId(requestParam.getToUserId()).
                                     actionType(requestParam.getActionType()).

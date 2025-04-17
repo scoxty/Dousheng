@@ -9,7 +9,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class RelationActionMsg implements Serializable {
+public class OperateDBMsg implements Serializable {
     private Long fromUserId;
     private Long toUserId;
     private Integer actionType;

@@ -16,7 +16,11 @@ public enum FavoriteErrorCodeEnum implements IErrorCode {
     VIDEO_NOT_EXIST("B000300", "视频不存在"),
     AUTHOR_NOT_EXIST("B000400", "作者不存在"),
     FAVORITE_NOT_EXIST("B000500", "点赞关系不存在"),
-    SEND_MESSAGE_ERROR("B000600", "发送消息失败");
+    SEND_MESSAGE_ERROR("B000600", "发送消息失败"),
+
+    MQ_SAVE_DB_ERROR("B000700", "保存数据库失败"),
+    MQ_SAVE_FAVORITE_ERROR("B000701", "保存点赞关系失败"),
+    MQ_DEL_FAVORITE_ERROR("B000702", "删除点赞关系失败");
 
     private final String code;
 

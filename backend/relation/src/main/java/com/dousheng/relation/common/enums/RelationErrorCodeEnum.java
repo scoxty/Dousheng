@@ -15,8 +15,12 @@ public enum RelationErrorCodeEnum implements IErrorCode {
     USER_NOT_EXIST("B000300", "用户不存在"),
     FOLLOW_NOT_EXIST("B000500", "关注关系不存在"),
     SEND_MESSAGE_ERROR("B000600", "发送消息失败"),
-    REPEAT_FOLLOW("B000301", "重复关注"),
-    REPEAT_CANCEL_FOLLOW("B000302", "重复取消关注");
+    REPEAT_FOLLOW("B000700", "重复关注"),
+    REPEAT_CANCEL_FOLLOW("B000701", "重复取消关注"),
+
+    MQ_OPERATE_DB_ERROR("B000800", "操作数据库失败"),
+    MQ_SAVE_RELATION_ERROR("B000801", "保存关注关系失败"),
+    MQ_DEL_RELATION_ERROR("B000802", "删除关注关系失败");
 
     private final String code;
 
