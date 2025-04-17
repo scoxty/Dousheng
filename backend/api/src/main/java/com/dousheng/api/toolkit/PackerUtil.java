@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.dousheng.api.dto.req.ModifyUserInfoReqDTO;
 import com.dousheng.api.dto.req.PublishReqDTO;
 import com.dousheng.api.dto.resp.IndexVideoDTO;
+import com.dousheng.api.dto.resp.RelationDTO;
 import com.dousheng.api.dto.resp.UserInfoDTO;
 import com.dousheng.api.dto.resp.VideoInfoDTO;
 
@@ -167,5 +168,19 @@ public class PackerUtil {
                 doIFollowVloger(videoInfoDTO.getIsFollow()).
                 doILikeThisVlog(videoInfoDTO.getIsFavorite()).
                 build();
+    }
+
+    public static List<RelationDTO> packRelationList(List<com.dousheng.dto.common.UserInfoDTO> requestParam) {
+        List<RelationDTO> relationDTOS = new ArrayList<>();
+        for (int i = 0; i < requestParam.size(); i++) {
+            com.dousheng.dto.common.UserInfoDTO userInfoDTO = requestParam.get(i);
+            relationDTOS.add(RelationDTO.builder().
+                    vlogerId(StrUtil.toString(userInfoDTO.getId())).
+                    nickname(userInfoDTO.getName()).
+                    face(userInfoDTO.getAvatar()).
+                    isFollowed(userInfoDTO.getIsFollow()).
+                    build());
+        }
+        return relationDTOS;
     }
 }

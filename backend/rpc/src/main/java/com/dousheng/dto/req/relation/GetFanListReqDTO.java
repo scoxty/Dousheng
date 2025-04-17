@@ -1,0 +1,16 @@
+package com.dousheng.dto.req.relation;
+
+import lombok.*;
+
+import java.io.Serializable;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
+public class GetFanListReqDTO implements Serializable {
+    private Long userId;
+    private Integer page;
+    private Integer pageSize;
+}

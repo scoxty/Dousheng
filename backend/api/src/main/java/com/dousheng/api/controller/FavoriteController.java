@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
+
 import static com.dousheng.api.common.constant.SuccessBaseRespConstant.SUCCESS_CODE;
 import static com.dousheng.api.common.enums.FavoriteActionTypeEnum.DISLIKE;
 import static com.dousheng.api.common.enums.FavoriteActionTypeEnum.LIKE;
@@ -31,7 +33,7 @@ import static com.dousheng.api.common.enums.FavoriteActionTypeEnum.LIKE;
 public class FavoriteController {
 
     private static final Log log = LogFactory.get();
-    @DubboReference
+    @DubboReference(timeout = 5000, retries = 3, loadbalance = "roundrobin")
     private FavoriteRpcService favoriteRpcService;
 
     @PostMapping("/vlog/like")
@@ -76,6 +78,8 @@ public class FavoriteController {
     public Result<PagedGridResult> getMyLikedList(@RequestParam String userId,
                                                   @RequestParam Integer page,
                                                   @RequestParam Integer pageSize) {
+        log.info("[getMyLikedList] 开始请求...");
+        Date now = new Date();
         GetFavoriteListReqDTO reqDTO = GetFavoriteListReqDTO.builder().
                 page(page).
                 pageSize(pageSize).
@@ -90,6 +94,8 @@ public class FavoriteController {
                     rows(PackerUtil.packApiPublishList(respDTO.getVideoList())). // 兼容前端...
                     build();
             log.info("[getMyLikedList] error: req={}, resp={}", reqDTO, respDTO);
+            Date now2 = new Date();
+            log.info("[getMyLikedList] 结束请求，耗时：{}ms", now2.getTime() - now.getTime());
             return Results.success(pagedGridResult);
         }
         Result<PagedGridResult> result = new Result<>();

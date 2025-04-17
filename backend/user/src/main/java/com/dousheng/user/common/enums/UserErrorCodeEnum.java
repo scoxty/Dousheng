@@ -22,6 +22,7 @@ public enum UserErrorCodeEnum implements IErrorCode {
     INVALID_IMAGE_TYPE("A000316", "图片类型错误"),
     PASSWORD_NOT_SUPPORT_UPDATE("A000317", "不支持修改密码"),
     LOCATION_NULL("A000318", "位置信息不能为空"),
+    USER_ID_LIST_NULL("A000319", "用户id列表不能为空"),
 
     USER_EXISTS("A000400", "用户已存在"),
     USER_NOT_EXISTS("A000401", "用户不存在"),

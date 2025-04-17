@@ -34,5 +34,6 @@ public class UserInfoDTO implements Serializable {
     private Integer myFansCounts;
     //    private Integer myLikedVlogCounts;
     private Integer totalLikeMeCounts;
+    private Boolean isFollow;
 }
 

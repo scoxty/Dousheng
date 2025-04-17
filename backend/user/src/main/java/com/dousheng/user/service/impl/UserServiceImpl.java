@@ -1,6 +1,7 @@
 package com.dousheng.user.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -12,17 +13,11 @@ import com.dousheng.dto.common.UserInfoDTO;
 import com.dousheng.dto.req.favorite.GetTotalLikeMeCountReqDTO;
 import com.dousheng.dto.req.relation.GetFansCountReqDTO;
 import com.dousheng.dto.req.relation.GetFollowsCountReqDTO;
-import com.dousheng.dto.req.user.AddUserReqDTO;
-import com.dousheng.dto.req.user.GetUserInfoReqDTO;
-import com.dousheng.dto.req.user.ModifyImageReqDTO;
-import com.dousheng.dto.req.user.ModifyUserInfoReqDTO;
+import com.dousheng.dto.req.user.*;
 import com.dousheng.dto.resp.favorite.GetTotalLikeMeCountRespDTO;
 import com.dousheng.dto.resp.relation.GetFansCountRespDTO;
 import com.dousheng.dto.resp.relation.GetFollowsCountRespDTO;
-import com.dousheng.dto.resp.user.AddUserRespDTO;
-import com.dousheng.dto.resp.user.GetUserInfoRespDTO;
-import com.dousheng.dto.resp.user.ModifyImageRespDTO;
-import com.dousheng.dto.resp.user.ModifyUserInfoRespDTO;
+import com.dousheng.dto.resp.user.*;
 import com.dousheng.service.FavoriteRpcService;
 import com.dousheng.service.RelationRpcService;
 import com.dousheng.user.common.convention.exception.ClientException;
@@ -45,6 +40,9 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.*;
 
 import static com.dousheng.user.common.constant.RedisCacheConstant.*;
@@ -241,6 +239,51 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         return respDTO;
     }
 
+    @Override
+    public IsExistRespDTO isExist(IsExistReqDTO requestParam) {
+        boolean isExist = true;
+        for (Long userId : requestParam.getUserIdList()) {
+            if (!userIdCachePenetrationBloomFilter.contains(userId)) {
+               isExist = false;
+               break;
+            }
+        }
+        return IsExistRespDTO.builder().
+                code(SUCCESS_CODE).
+                message(SUCCESS_MESSAGE).
+                isExist(isExist).
+                build();
+    }
+
+    @Override
+    public GetBaseUserInfoListRespDTO getBaseUserInfoList(GetBaseUserInfoListReqDTO requestParam) {
+        this.checkParam(requestParam);
+
+        List<Long> userIds = requestParam.getUserIds();
+        List<Long> filteredUserIds = userIds.stream().filter(userIdCachePenetrationBloomFilter::contains).toList();
+
+        List<UserInfoDTO> userInfoDTOS = new ArrayList<>();
+        for (Long userId : filteredUserIds) {
+            UserDO userDO = this.getBaseUserInfoById(userId);
+            userInfoDTOS.add(BeanUtil.copyProperties(userDO, UserInfoDTO.class));
+        }
+
+        return GetBaseUserInfoListRespDTO.builder().
+                code(SUCCESS_CODE).
+                message(SUCCESS_MESSAGE).
+                userInfos(userInfoDTOS).
+                build();
+    }
+
+    public void checkParam(GetBaseUserInfoListReqDTO requestParam) {
+        if (requestParam == null) {
+            throw new ClientException(REQUEST_PARAM_NULL);
+        }
+        if (CollectionUtil.isEmpty(requestParam.getUserIds())) {
+            throw new ClientException(USER_ID_LIST_NULL);
+        }
+    }
+
     public void checkParam(AddUserReqDTO requestParam) {
         if (requestParam == null || requestParam.getUserInfo() == null) {
             throw new ClientException(REQUEST_PARAM_NULL);
@@ -355,16 +398,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         }
     }
 
-    private boolean canUpdateDoushengNum(Long userId) {
-        LambdaQueryWrapper<UserDO> queryWrapper = Wrappers.lambdaQuery(UserDO.class)
-                .eq(UserDO::getId, userId);
-        UserDO userDO = baseMapper.selectOne(queryWrapper);
-        if (userDO == null) {
-            throw new ClientException(USER_NOT_EXISTS);
-        }
-        return userDO.getCanDoushengNumBeUpdated() == 1;
-    }
-
     public void checkParam(ModifyImageReqDTO requestParam) {
         if (requestParam == null) {
             throw new ClientException(REQUEST_PARAM_NULL);
@@ -392,6 +425,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
             throw new ClientException(INVALID_IMAGE_TYPE);
         }
 
+    }
+
+    public void checkParam(IsExistReqDTO requestParam) {
+        if (requestParam == null) {
+            throw new ClientException(REQUEST_PARAM_NULL);
+        }
+        if (CollectionUtil.isEmpty(requestParam.getUserIdList())) {
+            throw new ClientException(USER_ID_LIST_NULL);
+        }
+    }
+
+    private boolean canUpdateDoushengNum(Long userId) {
+        LambdaQueryWrapper<UserDO> queryWrapper = Wrappers.lambdaQuery(UserDO.class)
+                .eq(UserDO::getId, userId);
+        UserDO userDO = baseMapper.selectOne(queryWrapper);
+        if (userDO == null) {
+            throw new ClientException(USER_NOT_EXISTS);
+        }
+        return userDO.getCanDoushengNumBeUpdated() == 1;
     }
 
     public UserDO getBaseUserInfoById(Long id) {
