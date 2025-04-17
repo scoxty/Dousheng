@@ -280,10 +280,16 @@
 				var me = this;
 
 				if (!val) {
-					me.videoContext.pause();
+					console.log("pause");
 				} else {
 					me.videoContext.play();
 				}
+				
+				this.refreshVlogIsLiked();
+				this.refreshVlogCounts();
+				this.refreshIsFollowd();
+				this.setThisVlogInfo();
+				this.freshCommentCounts();
 			}
 		},
 		methods: {
@@ -456,6 +462,41 @@
 					this.$set(this.playerList, index, {
 						...vlog
 					}); // 保证响应
+				}
+			},
+			
+			refreshIsFollowd() {
+				var me = this;
+				var serverUrl = app.globalData.serverUrl;
+				var currentIndex = me.playerCur;
+				var vlog = me.playerList[currentIndex];
+				var myUserInfo = getApp().getUserInfoSession();
+				if (myUserInfo == null || myUserInfo == "undefined") { 
+					me.refreshRelationPlayList(vlog.vlogerId, false);
+					return;
+				}
+				var userId = myUserInfo.id;
+				uni.request({
+					method: "GET",
+					header: {
+						headerUserId: userId,
+						headerUserToken: app.getUserSessionToken()
+					},
+					url: serverUrl + "/fans/queryDoIFollowVloger?myId=" + userId + "&vlogerId=" + vlog.vlogerId,
+					success(result) {
+						if (result.data.code == "0") {
+							var isFollowed = result.data.data;
+							me.refreshRelationPlayList(vlog.vlogerId, isFollowed);
+						}
+					}
+				});
+			},
+			
+			refreshRelationPlayList(vlogerId, isFollowed) {
+				if (isFollowed) {
+					this.reFollowPlayList(vlogerId);
+				} else {
+					this.reCancelPlayList(vlogerId);
 				}
 			},
 
@@ -694,10 +735,10 @@
 
 				this.refreshVlogIsLiked();
 				this.refreshVlogCounts();
+				this.refreshIsFollowd();
 				this.setThisVlogInfo();
 				this.freshCommentCounts();
 			},
-
 			// 设置当前vlog的信息
 			setThisVlogInfo() {
 				var me = this;
@@ -710,7 +751,6 @@
 			},
 			
 			refreshVlogIsLiked() {
-				console.log("触发查询点赞状态");
 				var me = this;
 				var serverUrl = app.globalData.serverUrl;
 				var currentIndex = me.playerCur;
@@ -718,7 +758,6 @@
 				var myUserInfo = getApp().getUserInfoSession();
 				if (myUserInfo == null || myUserInfo == "undefined") { 
 					me.reChangeVlogLikedCountsInPlayList(vlog.vlogId, false);
-					console.log("未登录，直接设置未false");
 					return;
 				}
 				var userId = myUserInfo.id;
@@ -736,7 +775,6 @@
 						}
 					}
 				});
-				console.log("查询并设置点赞状态");
 			},
 			
 			reChangeVlogIsLikedInPlayList(vlogId, doILikeThisVlog) {
