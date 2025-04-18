@@ -200,4 +200,24 @@ public class VideoServiceHandler implements VideoRpcService {
         return respDTO;
     }
 
+    @Override
+    public IsExistRespDTO isExist(IsExistReqDTO requestParam) {
+        IsExistRespDTO respDTO = new IsExistRespDTO();
+        try {
+            respDTO = videoService.isExist(requestParam);
+            log.info("[isExist] success: req={}, resp={}", requestParam, respDTO);
+        } catch (AbstractException e) {
+            // 已知业务异常处理
+            respDTO.setCode(e.getErrorCode());
+            respDTO.setMessage(e.getErrorMessage());
+            log.error("[isExist] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        } catch (Throwable e) {
+            // 未知系统异常处理
+            respDTO.setCode(BaseErrorCode.SERVICE_ERROR.code());
+            respDTO.setMessage(BaseErrorCode.SERVICE_ERROR.message());
+            log.error("[isExist] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        }
+        return respDTO;
+    }
+
 }

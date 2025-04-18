@@ -78,8 +78,6 @@ public class FavoriteController {
     public Result<PagedGridResult> getMyLikedList(@RequestParam String userId,
                                                   @RequestParam Integer page,
                                                   @RequestParam Integer pageSize) {
-        log.info("[getMyLikedList] 开始请求...");
-        Date now = new Date();
         GetFavoriteListReqDTO reqDTO = GetFavoriteListReqDTO.builder().
                 page(page).
                 pageSize(pageSize).
@@ -94,8 +92,6 @@ public class FavoriteController {
                     rows(PackerUtil.packApiPublishList(respDTO.getVideoList())). // 兼容前端...
                     build();
             log.info("[getMyLikedList] error: req={}, resp={}", reqDTO, respDTO);
-            Date now2 = new Date();
-            log.info("[getMyLikedList] 结束请求，耗时：{}ms", now2.getTime() - now.getTime());
             return Results.success(pagedGridResult);
         }
         Result<PagedGridResult> result = new Result<>();

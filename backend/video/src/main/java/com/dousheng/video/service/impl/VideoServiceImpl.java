@@ -396,7 +396,7 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
             throw new ServiceException(VIDEO_NOT_EXIST);
         }
 
-        VideoDO videoDO = this.getBaseVideoDetail(requestParam);
+        VideoDO videoDO = this.getBaseVideoDetail(requestParam.getVideoId());
         if (videoDO.getIsPrivate().equals(YES.type) && !requestParam.getUserId().equals(videoDO.getAuthorId())) {
             throw new ServiceException(NO_PERMISSION);
         }
@@ -530,6 +530,35 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
         return respDTO;
     }
 
+    @Override
+    public IsExistRespDTO isExist(IsExistReqDTO requestParam) {
+        this.checkParam(requestParam);
+
+        if (!videoIdCachePenetrationBloomFilter.contains(requestParam.getVideoId())) {
+            return IsExistRespDTO.builder().
+                    code(SUCCESS_CODE).
+                    message(SUCCESS_MESSAGE).
+                    isExist(false).
+                    build();
+        }
+
+        VideoDO videoDO = this.getBaseVideoDetail(requestParam.getVideoId());
+
+        return IsExistRespDTO.builder().
+                code(SUCCESS_CODE).
+                message(SUCCESS_MESSAGE).
+                isExist(videoDO != null).
+                build();
+    }
+
+    public void checkParam(IsExistReqDTO requestParam) {
+        if (requestParam == null) {
+            throw new ClientException(REQUEST_PARAM_NULL);
+        }
+        if (requestParam.getVideoId() == null) {
+            throw new ClientException(VIDEO_ID_NULL);
+        }
+    }
 
     public void checkParam(PublishReqDTO requestParam) {
         if (requestParam == null) {
@@ -763,23 +792,23 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
                 .collect(Collectors.toList());
     }
 
-    public VideoDO getBaseVideoDetail(GetVideoDetailReqDTO requestParam) {
-        VideoDO videoDO = videoDetailLocalCache.getIfPresent(requestParam.getVideoId());
+    public VideoDO getBaseVideoDetail(Long videoId) {
+        VideoDO videoDO = videoDetailLocalCache.getIfPresent(videoId);
         if (videoDO != null) {
             return videoDO;
         }
 
-        String videoJsonStr = (String) redisTemplate.opsForValue().get(String.format(GET_VIDEO_DETAIL_BY_VIDEOID_KEY, requestParam.getVideoId()));
+        String videoJsonStr = (String) redisTemplate.opsForValue().get(String.format(GET_VIDEO_DETAIL_BY_VIDEOID_KEY, videoId));
         if (StrUtil.isNotBlank(videoJsonStr)) {
             videoDO = JSON.parseObject(videoJsonStr, VideoDO.class);
             videoDetailLocalCache.put(videoDO.getId(), videoDO);
             return videoDO;
         }
 
-        RLock lock = redissonClient.getLock(String.format(LOCK_GET_VIDEO_DETAIL_BY_VIDEOID_KEY, requestParam.getVideoId()));
+        RLock lock = redissonClient.getLock(String.format(LOCK_GET_VIDEO_DETAIL_BY_VIDEOID_KEY, videoId));
         lock.lock();
         try {
-            videoJsonStr = (String) redisTemplate.opsForValue().get(String.format(GET_VIDEO_DETAIL_BY_VIDEOID_KEY, requestParam.getVideoId()));
+            videoJsonStr = (String) redisTemplate.opsForValue().get(String.format(GET_VIDEO_DETAIL_BY_VIDEOID_KEY, videoId));
             if (StrUtil.isNotBlank(videoJsonStr)) {
                 videoDO = JSON.parseObject(videoJsonStr, VideoDO.class);
                 videoDetailLocalCache.put(videoDO.getId(), videoDO);
@@ -787,7 +816,7 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
             }
 
             LambdaQueryWrapper<VideoDO> queryWrapper = Wrappers.lambdaQuery(VideoDO.class)
-                    .eq(VideoDO::getId, requestParam.getVideoId());
+                    .eq(VideoDO::getId, videoId);
             videoDO = baseMapper.selectOne(queryWrapper);
             if (videoDO == null) {
                 throw new ServiceException(VIDEO_NOT_EXIST);

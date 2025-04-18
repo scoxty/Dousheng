@@ -8,6 +8,7 @@ import com.dousheng.api.dto.resp.IndexVideoDTO;
 import com.dousheng.api.dto.resp.RelationDTO;
 import com.dousheng.api.dto.resp.UserInfoDTO;
 import com.dousheng.api.dto.resp.VideoInfoDTO;
+import com.dousheng.dto.common.CommentDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -182,5 +183,55 @@ public class PackerUtil {
                     build());
         }
         return relationDTOS;
+    }
+
+    public static CommentDTO packComment(com.dousheng.api.dto.resp.CommentDTO commentDTO) {
+        return CommentDTO.builder()
+                    .id(NumberUtil.parseLong(commentDTO.getId()))
+                    .fatherCommentId(NumberUtil.parseLong(commentDTO.getFatherCommentId()))
+                    .authorId(NumberUtil.parseLong(commentDTO.getVlogerId()))
+                    .videoId(NumberUtil.parseLong(commentDTO.getVlogId()))
+                    .userId(NumberUtil.parseLong(commentDTO.getCommentUserId()))
+                    .content(commentDTO.getContent())
+                    .build();
+    }
+
+    public static com.dousheng.api.dto.resp.CommentDTO packApiCommentDTO(CommentDTO commentDTO) {
+            return com.dousheng.api.dto.resp.CommentDTO.builder()
+                    .id(StrUtil.toString(commentDTO.getId()))
+                    .fatherCommentId(StrUtil.toString(commentDTO.getFatherCommentId()))
+                    .vlogerId(StrUtil.toString(commentDTO.getAuthorId()))
+                    .vlogId(StrUtil.toString(commentDTO.getVideoId()))
+                    .commentUserId(StrUtil.toString(commentDTO.getUserId()))
+                    .commentUserFace(commentDTO.getAvatar())
+                    .commentUserNickname(commentDTO.getUsername())
+                    .replyedUserNickname(commentDTO.getReplayUsername())
+                    .content(commentDTO.getContent())
+                    .isLike(commentDTO.getIsLiked())
+                    .likeCounts(commentDTO.getLikeCount())
+                    .createTime(commentDTO.getCreateTime())
+                    .build();
+    }
+
+    public static List<com.dousheng.api.dto.resp.CommentDTO> packApiCommentDTOList(List<CommentDTO> commentDTOList) {
+        List<com.dousheng.api.dto.resp.CommentDTO> commentDTOS = new ArrayList<>();
+        for (int i = 0; i < commentDTOList.size(); i++) {
+            CommentDTO commentDTO = commentDTOList.get(i);
+            commentDTOS.add(com.dousheng.api.dto.resp.CommentDTO.builder()
+                    .id(StrUtil.toString(commentDTO.getId()))
+                    .fatherCommentId(StrUtil.toString(commentDTO.getFatherCommentId()))
+                    .vlogerId(StrUtil.toString(commentDTO.getAuthorId()))
+                    .vlogId(StrUtil.toString(commentDTO.getVideoId()))
+                    .commentUserId(StrUtil.toString(commentDTO.getUserId()))
+                    .commentUserFace(commentDTO.getAvatar())
+                    .commentUserNickname(commentDTO.getUsername())
+                    .replyedUserNickname(commentDTO.getReplayUsername())
+                    .content(commentDTO.getContent())
+                    .isLike(commentDTO.getIsLiked())
+                    .likeCounts(commentDTO.getLikeCount())
+                    .createTime(commentDTO.getCreateTime())
+                    .build());
+        }
+        return commentDTOS;
     }
 }

@@ -13,4 +13,5 @@ public interface VideoService {
     GetVideoDetailRespDTO getVideoDetail(GetVideoDetailReqDTO requestParam);
     GetVideoDetailListRespDTO getVideoDetailList(GetVideoDetailListReqDTO requestParam);
     GetWorkCountRespDTO getWorkCount(GetWorkCountReqDTO requestParam);
+    IsExistRespDTO isExist(IsExistReqDTO requestParam);
 }
