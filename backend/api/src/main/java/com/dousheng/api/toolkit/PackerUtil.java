@@ -9,6 +9,7 @@ import com.dousheng.api.dto.resp.RelationDTO;
 import com.dousheng.api.dto.resp.UserInfoDTO;
 import com.dousheng.api.dto.resp.VideoInfoDTO;
 import com.dousheng.dto.common.CommentDTO;
+import com.dousheng.dto.common.MessageDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -233,5 +234,19 @@ public class PackerUtil {
                     .build());
         }
         return commentDTOS;
+    }
+
+    public static List<com.dousheng.api.dto.resp.MessageDTO> packApiMessageDTOList(List<MessageDTO> messageDTOList) {
+        List<com.dousheng.api.dto.resp.MessageDTO> messageDTOS = new ArrayList<>();
+        for (int i = 0; i < messageDTOList.size(); i++) {
+            MessageDTO messageDTO = messageDTOList.get(i);
+            messageDTOS.add(com.dousheng.api.dto.resp.MessageDTO.builder()
+                    .senderId(StrUtil.toString(messageDTO.getSenderId()))
+                    .receiverId(StrUtil.toString(messageDTO.getReceiverId()))
+                    .content(messageDTO.getContent())
+                    .build()
+            );
+        }
+        return messageDTOS;
     }
 }

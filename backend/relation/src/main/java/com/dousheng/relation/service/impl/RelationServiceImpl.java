@@ -356,6 +356,37 @@ public class RelationServiceImpl extends ServiceImpl<RelationMapper, RelationDO>
                 build();
     }
 
+    @Override
+    public IsFriendRespDTO isFriend(IsFriendReqDTO requestParam) {
+        this.checkParam(requestParam);
+
+        IsFollowRespDTO isAFollowB = this.isFollow(
+                IsFollowReqDTO.builder()
+                        .fromUserId(requestParam.getUserIdA())
+                        .toUserId(requestParam.getUserIdB())
+                        .build()
+        );
+        if (!isAFollowB.getCode().equals(SUCCESS_CODE)) {
+            throw new ServiceException(isAFollowB.getMessage());
+        }
+
+        IsFollowRespDTO isBFollowA = this.isFollow(
+                IsFollowReqDTO.builder()
+                       .fromUserId(requestParam.getUserIdB())
+                       .toUserId(requestParam.getUserIdA())
+                       .build()
+        );
+        if (!isBFollowA.getCode().equals(SUCCESS_CODE)) {
+            throw new ServiceException(isBFollowA.getMessage());
+        }
+
+        return IsFriendRespDTO.builder()
+                .code(SUCCESS_CODE)
+                .message(SUCCESS_MESSAGE)
+                .isFriend(isAFollowB.getIsFollow() && isBFollowA.getIsFollow())
+                .build();
+    }
+
 
     public void checkParam(IsFollowReqDTO requestParam) {
         if (requestParam == null) {
@@ -425,6 +456,15 @@ public class RelationServiceImpl extends ServiceImpl<RelationMapper, RelationDO>
             throw new ClientException(REQUEST_PARAM_NULL);
         }
         if (requestParam.getUserId() == null) {
+            throw new ClientException(USER_ID_NULL);
+        }
+    }
+
+    public void checkParam(IsFriendReqDTO requestParam) {
+        if (requestParam == null) {
+            throw new ClientException(REQUEST_PARAM_NULL);
+        }
+        if (requestParam.getUserIdA() == null || requestParam.getUserIdB() == null) {
             throw new ClientException(USER_ID_NULL);
         }
     }

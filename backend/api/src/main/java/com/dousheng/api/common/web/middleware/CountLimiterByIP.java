@@ -20,7 +20,7 @@ public class CountLimiterByIP {
     private final RedisTemplate redisTemplate;
 
     private static final long LIMITER_TIME = 1000 * 60 * 60; // 1 h
-    private static final int MAX_COUNT = 12;
+    private static final int MAX_COUNT = 100; // 12
 
     public boolean isAllowed(HttpServletRequest request) {
         String ip = IPUtil.getRequestIp(request);

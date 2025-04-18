@@ -1,0 +1,31 @@
+server:
+  port: 3007
+
+spring:
+  application:
+    name: message
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: xty510521
+  datasource:
+    url: jdbc:mysql:///dousheng
+    username: root
+    password: xty510521
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+dubbo:
+  application:
+    name: message
+    qos-port: 22230
+  protocol:
+    name: dubbo
+    port: 20888
+  registry:
+    address: nacos://127.0.0.1:8848
+
+rocketmq:
+  name-server: 127.0.0.1:9876
+  producer:
+    group: dousheng-comment-producer-group

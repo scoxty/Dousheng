@@ -10,4 +10,5 @@ public interface RelationService {
     GetFollowsCountRespDTO getFollowsCount(GetFollowsCountReqDTO requestParam);
     GetFanListRespDTO getFanList(GetFanListReqDTO requestParam);
     GetFansCountRespDTO getFansCount(GetFansCountReqDTO requestParam);
+    IsFriendRespDTO isFriend(IsFriendReqDTO requestParam);
 }

@@ -140,4 +140,24 @@ public class RelationRpcServiceHandler implements RelationRpcService {
         return respDTO;
     }
 
+    @Override
+    public IsFriendRespDTO isFriend(IsFriendReqDTO requestParam) {
+        IsFriendRespDTO respDTO = new IsFriendRespDTO();
+        try {
+            respDTO = relationService.isFriend(requestParam);
+            log.info("[isFriend] success: req={}, resp={}", requestParam, respDTO);
+        } catch (AbstractException e) {
+            // 已知业务异常处理
+            respDTO.setCode(e.getErrorCode());
+            respDTO.setMessage(e.getErrorMessage());
+            log.error("[isFriend] error: req={}, resp={}", requestParam, respDTO, e);
+        } catch (Throwable e) {
+            // 未知系统异常处理
+            respDTO.setCode(BaseErrorCode.SERVICE_ERROR.code());
+            respDTO.setMessage(BaseErrorCode.SERVICE_ERROR.message());
+            log.error("[isFriend] error: req={}, resp={}", requestParam, respDTO, e);
+        }
+        return respDTO;
+    }
+
 }
