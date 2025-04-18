@@ -7,7 +7,7 @@
 		</view>
 
 		<!-- 消息列表 -->
-		<scroll-view class="chat-body" scroll-y scroll-with-animation :scroll-top="scrollTop">
+		<scroll-view class="chat-body" scroll-y scroll-with-animation :scroll-into-view="scrollIntoView" :scroll-top="scrollTop">
 			<view class="msg-wrapper" v-for="(msg, index) in list" :key="index"
 				:class="msg.senderId === loginUserId ? 'self' : 'friend'">
 				<image v-if="msg.senderId !== loginUserId" class="msg-face" :src="friend.face" />
@@ -62,12 +62,15 @@
 				// 监听键盘高度的方法
 				listener: null,
 
-				flag: 0
+				flag: 0,
+				
+				page: 0, 
+				totalPage: 0,
 			};
 		},
 		onLoad(param) {
 			this.setUserInfo(param);
-			this.getMessageList();
+			this.getMessageList(1);
 
 			// 开启键盘高度监听
 			this.listenerKeyboardHeight()
@@ -109,42 +112,79 @@
 				this.loginUserId = myUserInfo.id;
 
 			},
-			getMessageList() {
-				// mock 数据
-				this.list = [{
-						content: '你好啊',
-						senderId: '123',
-						recevierId: "1909990512585195521"
-					},
-					{
-						content: '请问剪辑软件是什么',
-						senderId: '123',
-						recevierId: "1909990512585195521"
-					},
-					{
-						content: '我用的是剪映～',
-						senderId: '1909990512585195521',
-						recevierId: "1909990512585195521"
-					}
-				];
-				this.$nextTick(this.scrollToBottom);
-			},
-			sendMsg() {
-				if (!this.content) {
-					uni.showToast({
-						title: "发送的消息不能为空",
-						icon: "none"
-					});
-					return
+			
+			loadMore() {
+				console.log("触发loadMore");
+				var nextPage = this.page + 1;
+				if (nextPage > this.totalPage) {
+					return;
 				}
-				this.list.push({
-					content: this.content,
-					senderId: this.loginUserId,
-					recevierId: this.friend.userId
+				this.getMessageList(nextPage)
+			},
+			
+			getMessageList(page) {
+				// mock 数据
+				// this.list = [{
+				// 		content: '你好啊',
+				// 		senderId: '123',
+				// 		receiverId: "1909990512585195521"
+				// 	},
+				// 	{
+				// 		content: '请问剪辑软件是什么',
+				// 		senderId: '123',
+				// 		receiverId: "1909990512585195521"
+				// 	},
+				// 	{
+				// 		content: '我用的是剪映～',
+				// 		senderId: '1909990512585195521',
+				// 		receiverId: "1909990512585195521"
+				// 	}
+				// ];
+				
+				var me = this;
+				var userId = getApp().getUserInfoSession().id;
+				var serverUrl = app.globalData.serverUrl;
+				
+				console.log("拉取聊天记录..., page" + page);
+				console.log("请求url: " + serverUrl + "/message/chat?userId=" + userId + "&friendId=" + this.friend.userId + "&page=" + page + "&pageSize=100");
+				
+				uni.request({
+					method: "GET",
+					header: {
+						headerUserId: userId,
+						headerUserToken: app.getUserSessionToken()
+					},
+					url: serverUrl + "/message/chat?userId=" + userId + "&friendId=" + this.friend.userId + "&page=" + page + "&pageSize=100", // 短期方案
+					success(result) {
+						if (result.data.code == "0") {
+							var messageList = result.data.data.rows;
+							var totalPage = result.data.data.total;
+							me.list = messageList.reverse().concat(me.list);
+							me.page = page;
+							me.totalPage = totalPage;
+						}
+					}
 				});
-				this.content = '';
+				
+				
 				this.$nextTick(this.scrollToBottom);
 			},
+			// sendMsg() {
+			// 	if (!this.content) {
+			// 		uni.showToast({
+			// 			title: "发送的消息不能为空",
+			// 			icon: "none"
+			// 		});
+			// 		return
+			// 	}
+			// 	this.list.push({
+			// 		content: this.content,
+			// 		senderId: this.loginUserId,
+			// 		receiverId: this.friend.userId
+			// 	});
+			// 	this.content = '';
+			// 	this.$nextTick(this.scrollToBottom);
+			// },
 			// scrollToBottom() {
 			// 	this.scrollTop = 999999;
 			// },
@@ -160,7 +200,7 @@
 
 				let data = {
 					senderId: this.loginUserId,
-					recevierId: this.friend.userId,
+					receiverId: this.friend.userId,
 					content: this.content
 				}
 				data = JSON.stringify(data);
@@ -177,7 +217,7 @@
 							}, 300)
 						},
 						fail(err) {
-							// 发送失败处理
+							console.log(err)
 						}
 					});
 				} else {
@@ -207,7 +247,7 @@
 
 			// 建立连接
 			connect() {
-				const url = app.globalData.wsServerUrl + "?userId=" + this.loginUserId + "?token=" + this.me.userToken;
+				const url = `${app.globalData.wsServerUrl}/chat/${this.loginUserId}/${this.me.userToken}`;
 				console.log(url);
 				uni.connectSocket({
 					url: url,
@@ -251,7 +291,7 @@
 			onMessageHandle(obj) {
 				this.list.push({
 					senderId: obj.senderId,
-					recevierId: obj.recevierId,
+					receiverId: obj.receiverId,
 					content: obj.content
 				})
 
@@ -264,7 +304,7 @@
 
 				this.list.push({
 					senderId: obj.senderId,
-					recevierId: obj.recevierId,
+					receiverId: obj.receiverId,
 					content: obj.content
 				});
 

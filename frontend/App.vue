@@ -5,7 +5,7 @@
 	export default {
 		globalData: {  
 			serverUrl: "http://192.168.140.76:3000", // 不能使用localhost
-			wsServerUrl: "ws://192.168.140.76:3007/chat",
+			wsServerUrl: "ws://192.168.140.76:3007",
 			
 			provinceList: provinceList,
 			cityList: cityList,
