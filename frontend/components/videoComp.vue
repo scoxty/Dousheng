@@ -280,7 +280,7 @@
 				var me = this;
 
 				if (!val) {
-					console.log("pause");
+					me.videoContext.pause();
 				} else {
 					me.videoContext.play();
 				}

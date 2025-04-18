@@ -185,6 +185,20 @@
 						@click="goToVlog(msg.msgContent.vlogId)"></image>
 				</view>
 			</block>
+			
+			<block v-for="(f, index) in followsList" :key="index">
+				<view class="msg-item-box" @click="goToChat(f.vlogerId, f.nickname, f.face)">
+					<view class="msg-item-left">
+						<image mode="scaleToFill" class="user-face" :src="f.face" style="align-self: center;"></image>
+							
+						<view class="msg-item-middle">
+							<text class="user-nickname">{{f.nickname}}</text>
+						</view>
+					</view>
+					
+				</view>
+			</block>
+			
 		</scroll-view>
 		
 	</view>
@@ -198,6 +212,9 @@
 				msgList: [],
 				page: 0,
 				totalPage: 0,
+				page2: 0,
+				totalPage2: 0,
+				followsList: []
 			}
 		},
 		onShow() {
@@ -206,6 +223,11 @@
 			this.msgList = [];
 			
 			this.fetchList(0);
+			
+			this.page2 = 0;
+			this.totalPage2 = 0;
+			this.followsList = [];
+			this.queryMyFollowList(0);
 		},
 		methods: {
 			goToVlog(vlogId) {
@@ -287,6 +309,7 @@
 			loadMore() {
 				var pendginPage = this.page + 1;
 				this.fetchList(pendginPage);
+				this.pagingFollowsList()
 			},
 			fetchList(page) {
 				var me = this;
@@ -336,6 +359,57 @@
 				var date = app.dateFormat("YYYY-mm-dd", new Date(dateTimeStr));
 				return getApp().getDateBeforeNow(date);
 			},
+			
+			queryMyFollowList(page) {
+				var me = this;
+				// if (page == 0) {
+				// 	me.followsList = [];
+				// }
+				page = page + 1;
+				var userId = getApp().getUserInfoSession().id;
+				var serverUrl = app.globalData.serverUrl;
+				
+				uni.request({
+					method: "GET",
+					header: {
+						headerUserId: userId,
+						headerUserToken: app.getUserSessionToken()
+					},
+					url: serverUrl + "/fans/queryMyFollows?myId=" + userId + "&page=" + page + "&pageSize=10",
+					success(result) {
+						if (result.data.code == "0") {
+							var followsList = result.data.data.rows;
+							var totalPage = result.data.data.total;
+							me.followsList = me.followsList.concat(followsList);
+							me.page2 = page;
+							me.totalPage2 = totalPage;
+						}
+					}
+				});
+			},
+			
+			// 上滑分页粉丝列表
+			pagingFollowsList() {
+				// this.followsList = this.followsList.concat(this.followsList);
+				
+				if (this.page2 >= this.totalPage2) {
+					return;
+				}
+				this.queryMyFollowList(this.page2);
+			},
+			
+			goToChat(userId, nickname, face) {
+				const friendInfo = {
+						userId: userId,
+						nickname: nickname,
+						face: face
+					};
+					// 使用 encodeURIComponent 编码
+					uni.navigateTo({
+						url: `../chat/chat?friendInfo=${encodeURIComponent(JSON.stringify(friendInfo))}`
+					});
+			},
+			
 		}
 	}
 </script>

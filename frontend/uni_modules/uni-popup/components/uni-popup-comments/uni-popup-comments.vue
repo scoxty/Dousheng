@@ -212,7 +212,7 @@
 						:class="{active : index == activeIndex}"
 						@touchstart="touchstartComment(index)"
 						@touchend="touchendComment()"
-						@longpress="deleteComment(commentContent.commentUserId, commentContent.commentId)">
+						@longpress="deleteComment(commentContent.commentUserId, commentContent.id)">
 						<view class="comments-wrapper" style="margin-left: 16rpx;margin-top: 16rpx;margin-right: 16rpx;">
 							<view class="comments-wrapper-sub-up" >
 								<view class="vlogger-wrapper">
@@ -220,7 +220,7 @@
 									<view style="margin-left: 10px;width: 456rpx;">
 										<view style="display: flex;flex-direction: row;">
 											<text style="font-size: 30rpx;color: #878585;align-self: center;">{{commentContent.commentUserNickname}}</text>
-											<view v-if="commentContent.vlogerId == thisVlogerId" class="tag-writer" style="align-self: center;">
+											<view v-if="commentContent.vlogerId == commentContent.commentUserId" class="tag-writer" style="align-self: center;">
 												<text class="writer-words" style="align-self: center;">作者</text>
 											</view>
 											
@@ -240,19 +240,19 @@
 										src="/static/images/icon-comment-like.png" 
 										class="like-or-not" 
 										style="align-self: center;"
-										@click="unlike(commentContent.commentUserId, commentContent.commentId, index)"></image>
+										@click="unlike(commentContent.commentUserId, commentContent.id, index)"></image>
 									<image v-if="commentContent.isLike == 0" 
 										src="/static/images/icon-comment-unlike.png" 
 										class="like-or-not" 
 										style="align-self: center;"
-										@click="like(commentContent.commentUserId, commentContent.commentId, index)"></image>
+										@click="like(commentContent.commentUserId, commentContent.id, index)"></image>
 									<text style="font-size: 22rpx;color: #878585;align-self: center;">{{getGraceNumber(commentContent.likeCounts)}}</text>
 								</view>
 							</view>
 							<view class="comments-wrapper-sub-down">
 								<image src="/static/face/face-arrow-1.png" class="img-face" style="opacity: 0;"></image>
 								<text style="font-size: 30rpx;color: #878585;margin-left: 10px;">{{getGraceDateBeforeNow(commentContent.createTime)}}</text>
-								<text style="font-size: 30rpx;color: #878585;margin-left: 20px;" @click="replyComment(commentContent.commentId, commentContent.commentUserNickname)">回复</text>
+								<text style="font-size: 30rpx;color: #878585;margin-left: 20px;" @click="replyComment(commentContent.id, commentContent.commentUserNickname)">回复</text>
 							</view>
 						</view>
 					</view>
@@ -336,8 +336,8 @@
 				// commentTouched: false,
 				activeIndex: -1,
 				
-				bottomTxt: "到底啦~深不？",
-				placeholder: "爱评论的人都是天使~",
+				bottomTxt: "暂时没有更多了",
+				placeholder: "善语结善缘，恶语伤人心",
 				commentFocus: false,
 				thisFatherCommentId: "0",	// 用于标识当前的回复是否有父id，还是仅仅只是普通评论
 				
@@ -384,7 +384,7 @@
 						if (me.thisVlogTotalComentCounts == 0) {
 							me.bottomTxt = "抢一个沙发吧~";
 						} else {
-							me.bottomTxt = "到底啦~深不？";
+							me.bottomTxt = "暂时没有更多了";
 						}
 						
 					}
@@ -598,6 +598,8 @@
 			// 回复他人的评论
 			replyComment(commentId, commentUserNickname) {
 				this.thisFatherCommentId = commentId;
+				console.log("commentId: " + commentId);
+				console.log("fatherCommentId: " + this.thisFatherCommentId);
 				this.commentFocus = true;
 				this.placeholder = "回复 @" + commentUserNickname;
 				// this.typingComment();
@@ -718,7 +720,6 @@
 			// 时间显示 刚刚/xx小时前/...
 			getGraceDateBeforeNow(dateTimeStr) {
 				var date = app.dateFormat("YYYY-mm-dd", new Date(dateTimeStr));
-				// console.log(date);
 				return getApp().getDateBeforeNow(date);
 			},
 			

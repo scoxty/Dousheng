@@ -85,7 +85,7 @@
 			// time 2020-09-10 20:20:20
 			getDateBeforeNow(stringTime) {
 				// console.log(stringTime);
-				stringTime = new Date(stringTime.replace(/-/g,'/'))
+				stringTime = new Date(stringTime.replace(/-/g,'/'));
 				
 				var minute = 1000 * 60;
 				var hour = minute * 60;
@@ -97,12 +97,10 @@
 				// console.log(time1);
 				// console.log(new Date(stringTime));
 				var time2 = Date.parse(new Date(stringTime)); //指定时间的时间戳
-				// console.log(time2);
 				var time = time1 - time2;
 		
 				var result = null;
 				if(time < 0) {
-					// alert("设置的时间不能早于当前时间！");
 					result = stringTime;
 				}else if(time/month >= 1){
 					result = parseInt(time/month) + "月前";
