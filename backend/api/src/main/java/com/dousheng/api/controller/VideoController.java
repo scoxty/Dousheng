@@ -86,6 +86,24 @@ public class VideoController {
         return Results.failure(respDTO.getCode(), respDTO.getMessage());
     }
 
+    @DeleteMapping("/vlog/delete")
+    public Result<Void> delVideo(@RequestParam("vlogerId") String vlogerId,
+                                 @RequestParam("userId") String userId,
+                                 @RequestParam("vlogId") String vlogId) {
+        DelVideoReqDTO reqDTO = DelVideoReqDTO.builder()
+                .userId(NumberUtil.parseLong(userId))
+                .authorId(NumberUtil.parseLong(vlogerId))
+                .videoId(NumberUtil.parseLong(vlogId))
+                .build();
+        DelVideoRespDTO respDTO = videoRpcService.delVideo(reqDTO);
+        if (respDTO.getCode().equals(SUCCESS_CODE)) {
+            log.info("[delete] success: req={}, resp={}", reqDTO, respDTO);
+            return Results.success();
+        }
+        log.error("[delete] error: req={}, resp={}", reqDTO, respDTO);
+        return Results.failure(respDTO.getCode(), respDTO.getMessage());
+    }
+
 
     @GetMapping("/vlog/detail")
     public Result<IndexVideoDTO> getVideoDetail(@RequestParam(defaultValue = "") String userId,

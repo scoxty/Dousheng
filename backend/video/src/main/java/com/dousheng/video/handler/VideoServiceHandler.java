@@ -41,6 +41,26 @@ public class VideoServiceHandler implements VideoRpcService {
     }
 
     @Override
+    public DelVideoRespDTO delVideo(DelVideoReqDTO requestParam) {
+        DelVideoRespDTO respDTO = new DelVideoRespDTO();
+        try {
+            respDTO = videoService.delVideo(requestParam);
+            log.info("[delVideo] success: req={}, resp={}", requestParam, respDTO);
+        } catch (AbstractException e) {
+            // 已知业务异常处理
+            respDTO.setCode(e.getErrorCode());
+            respDTO.setMessage(e.getErrorMessage());
+            log.error("[delVideo] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        } catch (Throwable e) {
+            // 未知系统异常处理
+            respDTO.setCode(BaseErrorCode.SERVICE_ERROR.code());
+            respDTO.setMessage(BaseErrorCode.SERVICE_ERROR.message());
+            log.error("[delVideo] error: req={}, resp={}, err={}", requestParam, respDTO, e);
+        }
+        return respDTO;
+    }
+
+    @Override
     public ChangeVideoToPrivateRespDTO changeVideoToPrivate(ChangeVideoToPrivateReqDTO requestParam) {
         ChangeVideoToPrivateRespDTO respDTO = new ChangeVideoToPrivateRespDTO();
         try {

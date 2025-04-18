@@ -5,6 +5,7 @@ import com.dousheng.dto.resp.video.*;
 
 public interface VideoService {
     PublishRespDTO publish(PublishReqDTO requestParam);
+    DelVideoRespDTO delVideo(DelVideoReqDTO requestParam);
     ChangeVideoToPrivateRespDTO changeVideoToPrivate(ChangeVideoToPrivateReqDTO requestParam);
     ChangeVideoToPublicRespDTO changeVideoToPublic(ChangeVideoToPublicReqDTO requestParam);
     GetBaseVideoListRespDTO getBaseVideoList(GetBaseVideoListReqDTO requestParam);

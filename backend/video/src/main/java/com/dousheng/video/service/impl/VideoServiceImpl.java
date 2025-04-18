@@ -29,6 +29,7 @@ import com.dousheng.service.CommentRpcService;
 import com.dousheng.service.FavoriteRpcService;
 import com.dousheng.service.RelationRpcService;
 import com.dousheng.service.UserRpcService;
+import com.dousheng.video.common.convention.exception.AbstractException;
 import com.dousheng.video.common.convention.exception.ClientException;
 import com.dousheng.video.common.convention.exception.RemoteException;
 import com.dousheng.video.common.convention.exception.ServiceException;
@@ -211,6 +212,30 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
         rocketMQTemplate.syncSend(HOT_VIDEO_TOPIC, videoInfoDTO);
 
         return PublishRespDTO.builder()
+                .code(SUCCESS_CODE)
+                .message(SUCCESS_MESSAGE)
+                .build();
+    }
+
+    @Override
+    public DelVideoRespDTO delVideo(DelVideoReqDTO requestParam) {
+        this.checkParam(requestParam);
+
+        LambdaQueryWrapper<VideoDO> queryWrapper = Wrappers.lambdaQuery(VideoDO.class)
+              .eq(VideoDO::getId, requestParam.getVideoId())
+              .eq(VideoDO::getAuthorId, requestParam.getAuthorId());
+        baseMapper.delete(queryWrapper);
+
+        redisTemplate.delete(String.format(GET_PUBLIC_LIST_KEY, requestParam.getUserId()));
+        publicListLocalCache.invalidate(requestParam.getUserId());
+
+        redisTemplate.delete(String.format(GET_VIDEO_DETAIL_BY_VIDEOID_KEY, requestParam.getVideoId()));
+        videoDetailLocalCache.invalidate(requestParam.getVideoId());
+
+        redisTemplate.delete(String.format(GET_WORKCOUNT_BY_AUTHORID_KEY, requestParam.getUserId()));
+        workCountLocalCache.invalidate(requestParam.getUserId());
+
+        return DelVideoRespDTO.builder()
                 .code(SUCCESS_CODE)
                 .message(SUCCESS_MESSAGE)
                 .build();
@@ -460,12 +485,22 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
         for (int i = 0; i < requestParam.getVideoIdList().size(); i++) {
             Long videoId = requestParam.getVideoIdList().get(i);
 
-            GetVideoDetailReqDTO getVideoDetailReqDTO = GetVideoDetailReqDTO.builder().
-                    userId(requestParam.getUserId()).
-                    videoId(videoId).
-                    build();
+            GetVideoDetailRespDTO getVideoDetailRespDTO = new GetVideoDetailRespDTO();
+            try {
+                GetVideoDetailReqDTO getVideoDetailReqDTO = GetVideoDetailReqDTO.builder().
+                        userId(requestParam.getUserId()).
+                        videoId(videoId).
+                        build();
 
-            GetVideoDetailRespDTO getVideoDetailRespDTO = this.getVideoDetail(getVideoDetailReqDTO);
+                getVideoDetailRespDTO = this.getVideoDetail(getVideoDetailReqDTO);
+            } catch (AbstractException e) {
+                if (e.getErrorCode().equals(VIDEO_NOT_EXIST.code())){
+                    continue;
+                }
+                throw new ServiceException(e.getMessage());
+            } catch (Exception e) {
+                throw new ServiceException(e.getMessage());
+            }
 
             if (getVideoDetailRespDTO.getVideoInfo().getIsPrivate().equals(YES.type)) {
                 continue;
@@ -554,6 +589,21 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoDO> implemen
     public void checkParam(IsExistReqDTO requestParam) {
         if (requestParam == null) {
             throw new ClientException(REQUEST_PARAM_NULL);
+        }
+        if (requestParam.getVideoId() == null) {
+            throw new ClientException(VIDEO_ID_NULL);
+        }
+    }
+
+    public void checkParam(DelVideoReqDTO requestParam) {
+        if (requestParam == null) {
+            throw new ClientException(REQUEST_PARAM_NULL);
+        }
+        if (requestParam.getUserId() == null || requestParam.getAuthorId() == null) {
+            throw new ClientException(USER_ID_NULL);
+        }
+        if (!requestParam.getUserId().equals(requestParam.getAuthorId())) {
+            throw new ClientException(NO_PERMISSION);
         }
         if (requestParam.getVideoId() == null) {
             throw new ClientException(VIDEO_ID_NULL);
