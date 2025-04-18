@@ -119,8 +119,7 @@
 		<!-- <uni-list @change="onchange" :num="playerList.length"> -->
 		<list :pagingEnabled="true" :show-scrollbar="false" @scroll="listScroll" @scrollend="scroll" :scrollable="true">
 			<cell :recycle="false" v-for="(item, index) in playerList" :key="index" :data-index="index"
-				:style="{'height': screenHeight + 'px'}"
-				@longpress="deleteVideo(item.vlogId, item.vlogerId)">
+				:style="{'height': screenHeight + 'px'}" @longpress="deleteVideo(item.vlogId, item.vlogerId)">
 				<!-- <uni-video :src="item.url" :playStatus="playStatus" :screenHeight="screenHeight" v-if="playerCur === index" @play="onplay"></uni-video> -->
 				<video ref="videoDetail" id="videoDetail" :object-fit="item.width >= item.height ? 'contain' : 'fill'"
 					:src="item.url" :controls="false" :enable-progress-gesture="false" v-if="playerCur === index" loop
@@ -679,14 +678,14 @@
 			deleteVideo(vlogId, vlogerId) {
 				const me = this;
 				const userId = getApp().getUserInfoSession().id;
-				
+
 				console.log("vlogId: " + vlogId + ", vlogerId: " + vlogerId);
 
 				if (vlogerId != userId) {
 					console.log("不允许删除视频");
 					return;
-				} 
-				
+				}
+
 				uni.showModal({
 					title: "提示",
 					content: "确定删除该视频吗？",
@@ -695,30 +694,29 @@
 							const userId = getApp().getUserInfoSession().id;
 							const serverUrl = app.globalData.serverUrl;
 
-
-
-							// uni.request({
-							// 	method: "DELETE",
-							// 	header: {
-							// 		headerUserId: userId,
-							// 		headerUserToken: app.getUserSessionToken()
-							// 	},
-							// 	url: `${serverUrl}/vlog/delete?vlogId=${vlogId}`,
-							// 	success(result) {
-							// 		if (result.data.code === "0") {
-							// 			uni.showToast({
-							// 				title: "删除成功",
-							// 				icon: "success"
-							// 			});
-							// 			me.playerList.splice(index, 1); // 从本地列表移除
-							// 		} else {
-							// 			uni.showToast({
-							// 				title: result.data.message || "删除失败",
-							// 				icon: "none"
-							// 			});
-							// 		}
-							// 	}
-							// });
+							uni.request({
+								method: "DELETE",
+								header: {
+									headerUserId: userId,
+									headerUserToken: app.getUserSessionToken()
+								},
+								url: serverUrl + "/vlog/delete?userId=" + userId + "&vlogerId=" + vlogerId + "&vlogId=" + vlogId,
+								success(result) {
+									if (result.data.code == "0") {
+										uni.showToast({
+											title: "删除成功",
+											icon: "none",
+											duration: 3000
+										});
+									} else {
+										uni.showToast({
+											title: result.data.message,
+											icon: "none",
+											duration: 3000
+										});
+									}
+								}
+							});
 						}
 					}
 				});
