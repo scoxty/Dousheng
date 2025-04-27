@@ -10,7 +10,7 @@ spring:
       max-request-size: 300MB
   data:
     redis:
-      host: 127.0.0.1
+      host: 8.134.107.55
       port: 6379
       password: xty510521
 
@@ -18,7 +18,9 @@ dubbo:
   application:
     name: api
   registry:
-    address: nacos://127.0.0.1:8848
+    address: nacos://8.134.107.55:8848
+    username: nacos
+    password: nacos
   protocol:
     name: dubbo
     port: 20880

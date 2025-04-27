@@ -60,7 +60,7 @@ public class VideoController {
                                 @RequestParam("height") Integer height,
                                 @RequestPart("file") MultipartFile file) {
         // 保存视频副本到本地
-        String tmpUrl = "D:\\project\\Dousheng\\tmpVideo\\" + UUID.randomUUID() + ".mp4";
+        String tmpUrl = "/home/xty/dousheng/tmpVideo/" + UUID.randomUUID() + ".mp4";
         try (FileOutputStream fos = new FileOutputStream(tmpUrl)) {
             fos.write(file.getBytes());
         } catch (IOException e) {

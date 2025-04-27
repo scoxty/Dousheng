@@ -4,8 +4,8 @@
 	import districtList from './json/area_district.js';
 	export default {
 		globalData: {  
-			serverUrl: "http://192.168.140.76:3000", // 不能使用localhost
-			wsServerUrl: "ws://192.168.140.76:3007",
+			serverUrl: "https://www.scoxty.com", // 不能使用localhost
+			wsServerUrl: "wss://www.scoxty.com",
 			
 			provinceList: provinceList,
 			cityList: cityList,

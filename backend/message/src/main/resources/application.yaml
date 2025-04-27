@@ -6,13 +6,13 @@ spring:
     name: message
   data:
     redis:
-      host: 127.0.0.1
+      host: 8.134.107.55
       port: 6379
-      password: xty510521
+      password: .Xty510521
   datasource:
     url: jdbc:mysql:///dousheng
     username: root
-    password: xty510521
+    password: .Xty510521
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 dubbo:
@@ -23,9 +23,11 @@ dubbo:
     name: dubbo
     port: 20888
   registry:
-    address: nacos://127.0.0.1:8848
+    address: nacos://8.134.107.55:8848
+    username: nacos
+    password: nacos
 
 rocketmq:
-  name-server: 127.0.0.1:9876
+  name-server: 8.134.107.55:9876
   producer:
     group: dousheng-comment-producer-group

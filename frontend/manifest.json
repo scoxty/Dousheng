@@ -1,6 +1,6 @@
 {
     "name" : "Dousheng",
-    "appid" : "__UNI__800FF13",
+    "appid" : "__UNI__157F91F",
     "description" : "",
     "versionName" : "1.0.0",
     "versionCode" : "100",
@@ -46,7 +46,8 @@
             },
             /* ios打包配置 */
             "ios" : {
-                "idfa" : false
+                "idfa" : false,
+                "dSYMs" : false
             },
             /* SDK配置 */
             "sdkConfigs" : {
@@ -56,10 +57,11 @@
                 "androidStyle" : "default",
                 "iosStyle" : "common",
                 "android" : {
-                    "hdpi" : "D:/project/Dousheng/background.png",
-                    "xhdpi" : "D:/project/Dousheng/background.png",
-                    "xxhdpi" : "D:/project/Dousheng/background.png"
-                }
+                    "hdpi" : "C:/Users/熊廷杨/Desktop/background.png",
+                    "xhdpi" : "C:/Users/熊廷杨/Desktop/background.png",
+                    "xxhdpi" : "C:/Users/熊廷杨/Desktop/background.png"
+                },
+                "useOriginalMsgbox" : true
             },
             "icons" : {
                 "android" : {
