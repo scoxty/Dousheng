@@ -136,9 +136,6 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public LogoutRespDTO logout(LogoutReqDTO requestParam) {
         this.checkParam(requestParam);
-        if (!this.isLogin(requestParam.getUserId())) {
-            throw new ClientException(USER_NOT_LOGIN);
-        }
         redisTemplate.delete(USER_LOGIN_KEY + requestParam.getUserId());
         LogoutRespDTO respDTO = LogoutRespDTO.builder().
                 code(SUCCESS_CODE).
