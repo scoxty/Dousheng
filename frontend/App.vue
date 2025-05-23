@@ -4,8 +4,8 @@
 	import districtList from './json/area_district.js';
 	export default {
 		globalData: {  
-			serverUrl: "http://192.168.140.76:3000", // 不能使用localhost
-			wsServerUrl: "ws://192.168.140.76:3007",
+			serverUrl: "http://10.102.80.203:3000", // 不能使用localhost
+			wsServerUrl: "ws://10.102.80.203:3007",
 			
 			provinceList: provinceList,
 			cityList: cityList,

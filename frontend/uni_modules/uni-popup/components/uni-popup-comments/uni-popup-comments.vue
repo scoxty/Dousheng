@@ -592,7 +592,7 @@
 				
 				this.thisFatherCommentId = "0";		// 恢复默认的回复fatherId为“0”
 				this.commentFocus = false;
-				this.placeholder = "爱评论的人都是天使~";
+				this.placeholder = "善语结善缘，恶语伤人心";
 			},
 			
 			// 回复他人的评论

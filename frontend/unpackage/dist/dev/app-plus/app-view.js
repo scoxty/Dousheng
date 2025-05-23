@@ -1200,21 +1200,17 @@ var render = function () {
                   "border-radius": "100px",
                   "align-self": "center",
                 },
-                attrs: { mode: "aspectFill", src: _vm._$g(4, "a-src"), _i: 4 },
+                attrs: { mode: "aspectFill", src: "", _i: 4 },
               }),
-              _c(
-                "v-uni-text",
-                {
-                  staticStyle: {
-                    "align-self": "center",
-                    "margin-top": "10rpx",
-                    "font-size": "14px",
-                    "font-weight": "400",
-                  },
-                  attrs: { _i: 5 },
+              _c("v-uni-text", {
+                staticStyle: {
+                  "align-self": "center",
+                  "margin-top": "10rpx",
+                  "font-size": "14px",
+                  "font-weight": "400",
                 },
-                [_vm._v("风间影月")]
-              ),
+                attrs: { _i: 5 },
+              }),
               _c(
                 "uni-view",
                 {
