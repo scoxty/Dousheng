@@ -1,5 +1,5 @@
 # 项目简介
-Dousheng是一个基于Uniapp + Spring Boot的短视频App。支持 **上传 / 浏览 / 点赞 / 评论 / 关注 / 私信** 等功能。
+Dousheng是一个基于uni-app + Spring Boot的短视频App。支持 **上传 / 浏览 / 点赞 / 评论 / 关注 / 私信** 等功能。
 # 项目架构
 ![image](https://github.com/user-attachments/assets/b79a35e1-d61f-4130-9c60-944e86b0c8e8)
 # 效果展示
